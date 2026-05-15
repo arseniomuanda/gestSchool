@@ -1,14 +1,19 @@
 .PHONY: up down build setup dev shell migrate fresh logs ps
 
-# First-time bootstrap: build, install deps, key (if missing), migrate, then start dev
+# First-time bootstrap: build, install deps, key (if missing), migrate.
+# Não inicia o runner — assim recriar containers (ex: alterar nginx) não mata o Vite.
 up:
-	@test -d node_modules || { echo "❌ node_modules em falta. Corre 'npm install' no host primeiro (ver docs/DOCKER.md)."; exit 1; }
 	docker compose up -d --build
 	docker compose exec php composer install
+	docker compose exec php npm install
 	@docker compose exec php sh -c "[ -f .env ] || cp .env.example .env"
 	@docker compose exec php sh -c "grep -q '^APP_KEY=base64:' .env || php artisan key:generate --ansi"
 	docker compose exec php php artisan migrate --force
-	docker compose exec php composer dev:docker
+	@echo ""
+	@echo "✅ Bootstrap completo. Próximo passo:"
+	@echo "   make dev    # arranca queue + pail + vite (foreground, Ctrl+C para parar)"
+	@echo ""
+	@echo "App: http://localhost:8000 · pgAdmin: http://localhost:5050 · Mailpit: http://localhost:8025"
 
 # Stop everything
 down:
@@ -20,8 +25,8 @@ build:
 
 # Just install deps + migrate (no dev runner)
 setup:
-	@test -d node_modules || { echo "❌ node_modules em falta. Corre 'npm install' no host primeiro."; exit 1; }
 	docker compose exec php composer install
+	docker compose exec php npm install
 	docker compose exec php php artisan migrate --force
 
 # Start the queue/pail/vite runner (foreground)

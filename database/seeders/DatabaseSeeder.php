@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AlunosEncarregadosSeeder::class, // 3000 alunos + encarregados + matrículas históricas
             AtribuicoesSeeder::class,     // professores × turmas × disciplinas
             PautasNotasPresencasSeeder::class, // avaliações, notas, aulas, presenças
+            DemoAlunoPedroSeeder::class,  // popula AL-2026-0001 com matrícula activa, notas e presenças
         ]);
     }
 }

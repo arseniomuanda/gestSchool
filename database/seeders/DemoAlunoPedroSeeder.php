@@ -7,6 +7,7 @@ use App\Models\AnoLectivo;
 use App\Models\Aula;
 use App\Models\Avaliacao;
 use App\Models\Matricula;
+use App\Models\Turma;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -20,8 +21,6 @@ use Illuminate\Support\Facades\DB;
  */
 class DemoAlunoPedroSeeder extends Seeder
 {
-    private const TURMA_ID_ALVO = 237; // 2ª A — ano activo 2026/2027
-
     public function run(): void
     {
         $aluno = Aluno::where('numero_processo', 'AL-2026-0001')->first();
@@ -38,8 +37,15 @@ class DemoAlunoPedroSeeder extends Seeder
             return;
         }
 
-        $matricula = $this->garantirMatricula($aluno, $anoActivo);
-        $this->command?->info("Matrícula activa: {$matricula->numero_matricula} (id={$matricula->id})");
+        $turma = $this->turmaAlvo($anoActivo->id);
+        if (! $turma) {
+            $this->command?->warn('Turma alvo (2ª A do ano activo) não existe. Correr TurmasSeeder primeiro.');
+
+            return;
+        }
+
+        $matricula = $this->garantirMatricula($aluno, $anoActivo, $turma);
+        $this->command?->info("Matrícula activa: {$matricula->numero_matricula} (turma {$turma->id})");
 
         $aluno->update([
             'classe' => '2ª Classe',
@@ -53,7 +59,15 @@ class DemoAlunoPedroSeeder extends Seeder
         $this->lancarPresencas($matricula);
     }
 
-    private function garantirMatricula(Aluno $aluno, AnoLectivo $ano): Matricula
+    private function turmaAlvo(int $anoLectivoId): ?Turma
+    {
+        return Turma::where('ano_lectivo_id', $anoLectivoId)
+            ->where('nome', 'A')
+            ->whereHas('classe', fn ($q) => $q->where('nome', '2ª'))
+            ->first();
+    }
+
+    private function garantirMatricula(Aluno $aluno, AnoLectivo $ano, Turma $turma): Matricula
     {
         return Matricula::firstOrCreate(
             [
@@ -61,7 +75,7 @@ class DemoAlunoPedroSeeder extends Seeder
                 'ano_lectivo_id' => $ano->id,
             ],
             [
-                'turma_id' => self::TURMA_ID_ALVO,
+                'turma_id' => $turma->id,
                 'numero_matricula' => $this->proximoNumeroMatricula(),
                 'data_matricula' => $ano->inicio,
                 'estado' => 'activa',

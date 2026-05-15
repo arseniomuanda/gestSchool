@@ -11,13 +11,17 @@ adaptado às versões e necessidades do projecto.
 ## TL;DR
 
 ```bash
-make up
+make up            # bootstrap: build + composer install + npm install + migrate
+make dev           # arranca o runner (queue + pail + vite) — fica em foreground
 ```
 
-Faz tudo: build das imagens, instalação de dependências, migrations, e arranque do
-runner de desenvolvimento (queue + pail + vite).
-
 A app fica em **http://localhost:8000**.
+
+> O `make up` é separado do `make dev` propositadamente: assim, se mais tarde
+> recriares um container (`docker compose up -d nginx`, por exemplo), o `php` é
+> recriado em cascata (via `depends_on`) — e isso mataria o runner se ele
+> estivesse a correr dentro de um `exec`. Mantendo-os separados, controlas o
+> ciclo de vida do Vite/queue independentemente.
 
 ---
 
@@ -87,7 +91,7 @@ Não precisas de PHP, Composer ou Node localmente — corre tudo dentro dos cont
 
 Todos os comandos são corridos via `make` a partir da raiz do projecto.
 
-### Bootstrap
+### Bootstrap (`make up`)
 
 ```bash
 make up
@@ -95,20 +99,33 @@ make up
 
 1. `docker compose up -d --build` — sobe (e constrói) todos os containers
 2. `composer install` dentro do container `php`
-3. `npm install` dentro do container `php`
+3. `npm install` dentro do container `php` (binários nativos para linux)
 4. Copia `.env.example` → `.env` (apenas se `.env` não existir)
 5. Gera `APP_KEY` (apenas se ainda não houver uma)
 6. `php artisan migrate --force`
-7. Lança `composer dev:docker` — runner com queue, pail e vite em paralelo
+7. Imprime mensagem com URL da app e instrução para correr `make dev`
+
+### Runner de desenvolvimento (`make dev`)
+
+```bash
+make dev
+```
+
+Lança `composer dev:docker` em foreground — três processos em paralelo:
+- `queue:listen`
+- `pail` (log viewer)
+- `vite` (HMR em `:5173`)
+
+`Ctrl+C` pára o runner. Os outros containers continuam UP.
 
 ### Operação diária
 
 | Comando | O que faz |
 |---|---|
-| `make up` | Bootstrap completo (idempotente) |
+| `make up` | Bootstrap (build + deps + migrate). Não arranca o runner. |
 | `make down` | Pára todos os containers |
 | `make build` | Rebuilds completos sem cache |
-| `make dev` | Relança o runner (queue + pail + vite) |
+| `make dev` | Arranca queue + pail + vite (foreground, `Ctrl+C` para parar) |
 | `make shell` | Abre `bash` dentro do container `php` |
 | `make migrate` | Corre `php artisan migrate` |
 | `make fresh` | `php artisan migrate:fresh --seed` |
@@ -168,30 +185,20 @@ mudanças em PHP, Blade, JS ou CSS.
 
 ### Instalar dependências (npm / composer)
 
-> ⚠️ **Importante:** corre `npm install` **fora** do container (no host).
->
-> Quando o `npm install` corre dentro do container, o mount em `/var/www` faz com
-> que o npm reescreva o `package-lock.json` com `"name": "www"` em vez de
-> `"gestSchool"`. Isso polui o lockfile e cria diff espúrio em cada commit.
->
-> Mesmo se não tiveres Node localmente, prefere instalar Node só para isto
-> (via [nvm](https://github.com/nvm-sh/nvm) leva 30 segundos) — o container
-> usa o `node_modules` resultante do mount.
->
-> O `composer install` dentro do container é seguro e é o que `make up` faz.
+Corre **sempre dentro do container** — assim os binários nativos (Rollup, esbuild,
+Tailwind oxide, etc.) são compilados/baixados para `linux-arm64`/`linux-x86_64`
+em vez do SO do host:
 
 ```bash
-# Host (correr no terminal normal)
-npm install
-
-# Container (já feito automaticamente pelo make up)
 docker compose exec php composer install
+docker compose exec php npm install
 ```
 
-Se já corrompeste o `package-lock.json` por engano:
-```bash
-git checkout -- package-lock.json
-```
+Ambos são feitos automaticamente pelo `make up`.
+
+> O `package.json` declara `"name": "gestschool"` precisamente para que o npm não
+> infira `"www"` (o nome do directório de trabalho dentro do container) e polua o
+> lockfile. Não removas esse campo.
 
 ### Vite HMR
 
@@ -341,6 +348,18 @@ reinicializar com o named volume.
 O ficheiro `.docker/php/docker.conf` tem de declarar `listen = 9000` no bloco `[www]`
 — senão o PHP-FPM 8.4+ falha a inicializar quando o nosso pool override esconde o
 default do `www.conf`.
+
+### Vite: `Cannot find module @rollup/rollup-linux-arm64-gnu`
+
+Significa que correste `npm install` no host (que instalou os binários nativos para
+`darwin`) mas o container precisa dos binários `linux`. Reinstala dentro do container:
+
+```bash
+docker compose exec php sh -c "rm -rf node_modules package-lock.json && npm install"
+```
+
+Confirma que `package.json` tem `"name": "gestschool"` declarado — sem isso, o npm
+inferia o nome a partir do directório (`/var/www` → `"www"`) e poluía o lockfile.
 
 ---
 
