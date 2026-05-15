@@ -76,10 +76,7 @@ Não precisas de PHP, Composer ou Node localmente — corre tudo dentro dos cont
     │   ├── default.conf               # Vhost que serve public/
     │   └── nginx.conf                 # Config global
     ├── db/
-    │   ├── .gitignore                 # Ignora data/
     │   └── sql/                       # Scripts SQL executados na 1ª inicialização do Postgres
-    ├── redis/
-    │   └── .gitignore                 # Ignora data/
     └── logs/
         └── .gitignore
 ```
@@ -169,6 +166,33 @@ Os ficheiros são montados via volume (`.:/var/www`), portanto qualquer alteraç
 local é imediatamente visível dentro dos containers. Não precisas de rebuild para
 mudanças em PHP, Blade, JS ou CSS.
 
+### Instalar dependências (npm / composer)
+
+> ⚠️ **Importante:** corre `npm install` **fora** do container (no host).
+>
+> Quando o `npm install` corre dentro do container, o mount em `/var/www` faz com
+> que o npm reescreva o `package-lock.json` com `"name": "www"` em vez de
+> `"gestSchool"`. Isso polui o lockfile e cria diff espúrio em cada commit.
+>
+> Mesmo se não tiveres Node localmente, prefere instalar Node só para isto
+> (via [nvm](https://github.com/nvm-sh/nvm) leva 30 segundos) — o container
+> usa o `node_modules` resultante do mount.
+>
+> O `composer install` dentro do container é seguro e é o que `make up` faz.
+
+```bash
+# Host (correr no terminal normal)
+npm install
+
+# Container (já feito automaticamente pelo make up)
+docker compose exec php composer install
+```
+
+Se já corrompeste o `package-lock.json` por engano:
+```bash
+git checkout -- package-lock.json
+```
+
 ### Vite HMR
 
 O Vite está configurado para fazer bind em `0.0.0.0:5173` com HMR a apontar para
@@ -200,16 +224,22 @@ Para parar o runner: `Ctrl+C`. Os outros containers continuam a correr.
 
 ## Persistência de dados
 
-| Volume | Localização local | Conteúdo |
+| Volume | Tipo | Conteúdo |
 |---|---|---|
-| Postgres | `.docker/db/data/` | Ficheiros do Postgres |
-| Redis | `.docker/redis/data/` | AOF do Redis |
+| `db_data` | named volume | Cluster Postgres |
+| `redis_data` | named volume | AOF do Redis |
 
-Ambas estão no `.gitignore`. Para apagar os dados (e começar do zero):
+> **Porquê named volumes em vez de bind mounts?** No Docker Desktop para macOS, bind
+> mounts vão pela camada de file sharing (VirtioFS/FUSE), que quebra `fsync()` e file
+> locking. Com Postgres, isso traduz-se em corrupção mid-flight (`pg_filenode.map`
+> desaparece). Named volumes ficam dentro da VM do Docker e usam ext4 directamente — é
+> rápido e fiável. O trade-off é que os dados não são visíveis a partir do host.
+
+Para apagar os dados (e começar do zero):
 
 ```bash
 make down
-rm -rf .docker/db/data .docker/redis/data
+docker compose down -v   # remove os named volumes
 make up
 ```
 
@@ -228,6 +258,26 @@ Postgres na **primeira** inicialização do container (quando `data/` está vazi
 ---
 
 ## Troubleshooting
+
+### `package-lock.json` ficou com `"name": "www"`
+
+Aconteceu porque correste `npm install` dentro do container. Reverte:
+
+```bash
+git checkout -- package-lock.json
+```
+
+A partir daí, corre `npm install` apenas no host. Ver [Instalar dependências](#instalar-dependências-npm--composer).
+
+### Modos de ficheiro mudam para `100755` sozinhos
+
+Quando o entrypoint Docker corre `chmod`, o git detecta mudanças de mode em
+ficheiros como `storage/*/.gitignore` que continuam a aparecer no `git status`
+mesmo sem alteração de conteúdo. Fix permanente neste clone:
+
+```bash
+git config core.fileMode false
+```
 
 ### Porta 80 já em uso
 
@@ -275,11 +325,22 @@ make up
 ### Limpar tudo e recomeçar
 
 ```bash
-make down
-docker compose down -v          # remove volumes anónimos também
-rm -rf .docker/db/data .docker/redis/data
+docker compose down -v   # remove containers + named volumes
 make up
 ```
+
+### Postgres dá `could not open file "global/pg_filenode.map"` ou shut down inesperado
+
+Sintoma de bind mount em macOS. Confirma que o `docker-compose.yml` usa
+`db_data:/var/lib/postgresql` (named volume) e **não** `.docker/db/data:/var/lib/postgresql`
+(bind mount). Se acabaste de mudar, faz `docker compose down -v && make up` para
+reinicializar com o named volume.
+
+### PHP-FPM não arranca: `no listen address have been defined!`
+
+O ficheiro `.docker/php/docker.conf` tem de declarar `listen = 9000` no bloco `[www]`
+— senão o PHP-FPM 8.4+ falha a inicializar quando o nosso pool override esconde o
+default do `www.conf`.
 
 ---
 
@@ -288,14 +349,18 @@ make up
 O template original assume MySQL; a nossa stack foi adaptada para:
 
 - **Postgres 18** em vez de MySQL 8.1 (sem MySQL/MariaDB no compose)
+  - Mount em `/var/lib/postgresql` (não `/var/lib/postgresql/data`) — exigido pelo layout versionado do Postgres 18
+  - **Named volume** `db_data` em vez de bind mount (bind mounts quebram Postgres em macOS)
 - **pgAdmin 4** em vez de phpMyAdmin/Adminer
 - **`pdo_sqlite`** adicionado (para compatibilidade com setup não-Docker do projecto)
 - Removidos `pdo_mysql`, `npm install npm@latest -g` (causa erros) e `yarn` (não usado)
+- `listen = 9000` adicionado ao `docker.conf` do PHP-FPM (necessário em PHP-FPM 8.4+)
 - Timezone PHP: `Africa/Luanda`
 - Credenciais DB: `gestschool` (em vez de `refactorian`)
 - Adicionado `Makefile` com atalho `make up` para bootstrap completo
 - Adicionado `composer dev:docker` script (queue + pail + vite, sem `php artisan serve`)
 - `vite.config.js` configurado para bind em `0.0.0.0` com polling
+- Redis também passou a usar named volume `redis_data`
 
 ---
 
