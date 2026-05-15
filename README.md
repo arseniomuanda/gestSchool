@@ -115,8 +115,7 @@ A aplicação fica disponível em `http://localhost:8000`.
 Se preferires não instalar PHP/Composer/Node localmente, há um setup Docker completo:
 
 ```bash
-make up            # bootstrap: build + composer install + npm install + migrate
-make dev           # arranca queue + pail + vite (Ctrl+C para parar)
+make start         # bootstrap + runner num único comando
 ```
 
 A app fica em `http://localhost:8000`. Detalhes completos, comandos e troubleshooting em **[docs/DOCKER.md](docs/DOCKER.md)**.

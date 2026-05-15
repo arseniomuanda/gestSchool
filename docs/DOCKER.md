@@ -11,6 +11,12 @@ adaptado às versões e necessidades do projecto.
 ## TL;DR
 
 ```bash
+make start         # bootstrap + runner num único comando (foreground)
+```
+
+Ou em dois passos (útil quando já tens tudo instalado e só queres relançar o runner):
+
+```bash
 make up            # bootstrap: build + composer install + npm install + migrate
 make dev           # arranca o runner (queue + pail + vite) — fica em foreground
 ```
@@ -122,6 +128,7 @@ Lança `composer dev:docker` em foreground — três processos em paralelo:
 
 | Comando | O que faz |
 |---|---|
+| `make start` | Bootstrap + runner (= `make up && make dev`) |
 | `make up` | Bootstrap (build + deps + migrate). Não arranca o runner. |
 | `make down` | Pára todos os containers |
 | `make build` | Rebuilds completos sem cache |

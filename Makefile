@@ -1,4 +1,7 @@
-.PHONY: up down build setup dev shell migrate fresh logs ps
+.PHONY: start up down build setup dev shell migrate fresh logs ps
+
+# One-shot: bootstrap + runner. Equivalente a `make up && make dev`.
+start: up dev
 
 # First-time bootstrap: build, install deps, key (if missing), migrate.
 # Não inicia o runner — assim recriar containers (ex: alterar nginx) não mata o Vite.
