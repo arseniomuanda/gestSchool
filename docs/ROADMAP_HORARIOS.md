@@ -12,7 +12,7 @@
 | 1 | [Copy-paste de slots](#fase-1--copy-paste-de-slots) | ✅ Concluída (2026-05-15) | 🟢 1-2h | 🟢 Alto | 🟢 Baixo |
 | 2 | [Bulk editor por professor](#fase-2--bulk-editor-por-professor) | ✅ Concluída (2026-05-15) | 🟡 2-3h | 🟡 Médio | 🟡 Médio |
 | 3 | [Drag & drop](#fase-3--drag--drop-de-slots) | ✅ Concluída (2026-05-15) | 🔴 4-6h | 🟡 Médio | 🟡 Médio |
-| 4 | [Sugestões IA / lacunas](#fase-4--sugestões-automáticas-ia--heurísticas) | ⬜ Pendente | 🔴 4-8h | 🟢 Alto | 🔴 Alto |
+| 4 | [Sugestões IA / lacunas](#fase-4--sugestões-automáticas-ia--heurísticas) | 🟦 Em curso | 🔴 4-8h | 🟢 Alto | 🔴 Alto |
 
 **Legenda:** ⬜ Pendente · 🟦 Em curso · ✅ Concluída · 🟥 Bloqueada · ⏸ Adiada
 

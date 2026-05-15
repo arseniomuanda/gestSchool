@@ -10,6 +10,7 @@
             'disciplina' => $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8),
             'disciplina_full' => $a->disciplina->nome,
             'professor' => \Illuminate\Support\Str::limit($a->professor->user->name, 14),
+            'carga_horaria' => $a->disciplina->carga_horaria_semanal,
         ];
     }
     $turmaColors = [ $turma->id => TurmaColor::for($turma->id) ];
@@ -211,11 +212,12 @@
                             @foreach($atribuicoes as $a)
                                 @php($c = TurmaColor::for($a->turma_id))
                                 <div data-atribuicao-id="{{ $a->id }}"
-                                     class="dnd-card cursor-move px-2 py-1 rounded text-[11px] leading-tight"
+                                     class="dnd-card cursor-move px-2 py-1 rounded text-[11px] leading-tight flex items-center justify-between gap-1"
                                      style="background: {{ $c['bg'] }}; border-left: 3px solid {{ $c['border'] }}; color: {{ $c['fg'] }}"
-                                     x-bind:class="usedAtribuicoes.has('{{ $a->id }}') ? 'opacity-50' : ''"
+                                     x-bind:class="cargaCompleta('{{ $a->id }}') ? 'opacity-50' : ''"
                                      title="{{ $a->disciplina->nome }} · {{ $a->professor->user->name }}">
-                                    {{ $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8) }} · {{ \Illuminate\Support\Str::limit($a->professor->user->name, 14) }}
+                                    <span class="truncate">{{ $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8) }} · {{ \Illuminate\Support\Str::limit($a->professor->user->name, 14) }}</span>
+                                    <span class="font-mono text-[10px] shrink-0 bg-white/40 px-1 rounded" x-text="cargaLabel('{{ $a->id }}')"></span>
                                 </div>
                             @endforeach
                         </div>

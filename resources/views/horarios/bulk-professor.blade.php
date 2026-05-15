@@ -12,6 +12,7 @@
             'turma_label' => $a->turma->classe->nome . $a->turma->nome,
             'disciplina' => $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8),
             'disciplina_full' => $a->disciplina->nome,
+            'carga_horaria' => $a->disciplina->carga_horaria_semanal,
         ];
     }
     $i18n = [
@@ -208,11 +209,12 @@
                             @foreach($atribuicoes as $a)
                                 @php($c = $turmaColors[$a->turma_id])
                                 <div data-atribuicao-id="{{ $a->id }}"
-                                     class="dnd-card cursor-move px-2 py-1 rounded text-[11px] leading-tight"
+                                     class="dnd-card cursor-move px-2 py-1 rounded text-[11px] leading-tight flex items-center justify-between gap-1"
                                      style="background: {{ $c['bg'] }}; border-left: 3px solid {{ $c['border'] }}; color: {{ $c['fg'] }}"
-                                     x-bind:class="usedAtribuicoes.has('{{ $a->id }}') ? 'opacity-50' : ''"
+                                     x-bind:class="cargaCompleta('{{ $a->id }}') ? 'opacity-50' : ''"
                                      title="{{ $a->turma->classe->nome }}{{ $a->turma->nome }} · {{ $a->disciplina->nome }}">
-                                    [{{ $a->turma->classe->nome }}{{ $a->turma->nome }}] {{ $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8) }}
+                                    <span class="truncate">[{{ $a->turma->classe->nome }}{{ $a->turma->nome }}] {{ $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8) }}</span>
+                                    <span class="font-mono text-[10px] shrink-0 bg-white/40 px-1 rounded" x-text="cargaLabel('{{ $a->id }}')"></span>
                                 </div>
                             @endforeach
                         </div>

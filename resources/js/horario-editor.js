@@ -131,15 +131,33 @@ export function horarioEditor(opts) {
             return out;
         },
 
-        get usedAtribuicoes() {
-            const used = new Set();
+        /** Map atribuicao_id (string) → nº de slots ocupados na semana. */
+        get slotCountByAtr() {
+            const out = {};
             for (const dia of this.diasLectivos) {
                 for (const tempo in this.slots[dia]) {
                     const id = this.slots[dia][tempo].atribuicao_id;
-                    if (id) used.add(String(id));
+                    if (!id) continue;
+                    const key = String(id);
+                    out[key] = (out[key] || 0) + 1;
                 }
             }
-            return used;
+            return out;
+        },
+
+        /** Devolve "actual/esperada" ou só "actual" se a disciplina não declarar carga. */
+        cargaLabel(atrId) {
+            const actual = this.slotCountByAtr[String(atrId)] || 0;
+            const info = this.atrPayload[atrId];
+            const esperada = info?.carga_horaria;
+            return esperada ? `${actual}/${esperada}` : `${actual}`;
+        },
+
+        /** True quando carga horária semanal foi atingida ou ultrapassada. */
+        cargaCompleta(atrId) {
+            const actual = this.slotCountByAtr[String(atrId)] || 0;
+            const info = this.atrPayload[atrId];
+            return info?.carga_horaria ? actual >= info.carga_horaria : false;
         },
 
         cellStyle(atrId) {
@@ -285,15 +303,14 @@ export function horarioEditor(opts) {
             this.sortables = [];
         },
 
-        findExistingSlot(atrId) {
+        countOccurrences(atrId) {
+            let n = 0;
             for (const dia of this.diasLectivos) {
                 for (const tempo in this.slots[dia]) {
-                    if (this.slots[dia][tempo].atribuicao_id === atrId) {
-                        return { dia: String(dia), tempo: String(tempo) };
-                    }
+                    if (this.slots[dia][tempo].atribuicao_id === atrId) n++;
                 }
             }
-            return null;
+            return n;
         },
 
         handleDrop(evt) {
@@ -310,30 +327,17 @@ export function horarioEditor(opts) {
             const [td, tt] = toCell.split(':');
             const previousDest = this.slots[td][tt].atribuicao_id;
 
-            // Se vem do pool e a atribuição já está noutra célula → mover (não duplicar)
-            const existing = fromPool ? this.findExistingSlot(atrId) : null;
-
             if (fromPool) {
-                if (existing && (existing.dia !== td || existing.tempo !== tt)) {
-                    // Mover da célula existente
-                    this.slots[existing.dia][existing.tempo].atribuicao_id = '';
-                    if (previousDest && previousDest !== atrId) {
-                        this.slots[existing.dia][existing.tempo].atribuicao_id = previousDest;
-                        this.dragWarning = this.i18n.swappedWarning || 'Swapped two slots.';
-                    } else {
-                        this.dragWarning = this.i18n.movedWarning || 'Moved an existing slot.';
-                    }
-                    this.slots[td][tt].atribuicao_id = atrId;
-                } else {
-                    if (previousDest) {
-                        this.dragWarning = this.i18n.replacedWarning || 'Replaced an existing slot.';
-                    }
-                    this.slots[td][tt].atribuicao_id = atrId;
+                // From pool: o pool é um menu — uma atribuição pode aparecer em vários slots
+                // (carga horária semanal típica: 2-4 tempos/semana por disciplina)
+                if (previousDest && previousDest !== atrId) {
+                    this.dragWarning = this.i18n.replacedWarning || 'Replaced an existing slot.';
                 }
+                this.slots[td][tt].atribuicao_id = atrId;
             } else {
+                // From cell → cell: mover (ou swap se destino ocupado)
                 const [fd, ft] = fromCell.split(':');
                 if (previousDest && previousDest !== atrId) {
-                    // swap entre células
                     this.slots[fd][ft].atribuicao_id = previousDest;
                     this.slots[td][tt].atribuicao_id = atrId;
                     this.dragWarning = this.i18n.swappedWarning || 'Swapped two slots.';
