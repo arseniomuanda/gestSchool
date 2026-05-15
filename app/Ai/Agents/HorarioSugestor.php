@@ -23,7 +23,7 @@ use Stringable;
  * sugestão, não como verdade absoluta.
  */
 #[Provider(Lab::Gemini)]
-#[Model('gemini-2.0-flash')]
+#[Model('gemini-3-flash-preview')]
 class HorarioSugestor implements Agent, HasStructuredOutput
 {
     use Promptable;
