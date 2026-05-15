@@ -12,7 +12,7 @@
 | 1 | [Copy-paste de slots](#fase-1--copy-paste-de-slots) | ✅ Concluída (2026-05-15) | 🟢 1-2h | 🟢 Alto | 🟢 Baixo |
 | 2 | [Bulk editor por professor](#fase-2--bulk-editor-por-professor) | ✅ Concluída (2026-05-15) | 🟡 2-3h | 🟡 Médio | 🟡 Médio |
 | 3 | [Drag & drop](#fase-3--drag--drop-de-slots) | ✅ Concluída (2026-05-15) | 🔴 4-6h | 🟡 Médio | 🟡 Médio |
-| 4 | [Sugestões IA / lacunas](#fase-4--sugestões-automáticas-ia--heurísticas) | 🟦 Em curso | 🔴 4-8h | 🟢 Alto | 🔴 Alto |
+| 4 | [Sugestões IA / lacunas](#fase-4--sugestões-automáticas-ia--heurísticas) | 🟦 4.1+4.2 ✅, 4.3 ⬜ | 🔴 4-8h | 🟢 Alto | 🔴 Alto |
 
 **Legenda:** ⬜ Pendente · 🟦 Em curso · ✅ Concluída · 🟥 Bloqueada · ⏸ Adiada
 
@@ -209,10 +209,18 @@ Sistema sugere/avisa sobre **lacunas** e **má distribuição** no horário, e p
 - Identifica **atribuições não escaladas** (atribuições sem nenhum slot no horário)
 - Identifica **carga horária semanal** vs. `disciplina.carga_horaria_semanal` (config) → assinala quando difere
 
-#### 4.2 — Análise de distribuição
-- Detectar **disciplinas pesadas** (Mat, Port) concentradas num só dia → sugerir espalhar
-- Detectar **prof. sobrecarregado** (>X tempos consecutivos) → avisar
-- Detectar **disciplina + prof. em horas más** (ex: Mat no 8º tempo de 6ª) → assinalar
+#### 4.2 — Análise de distribuição ✅ Concluída (2026-05-15)
+- ✅ Detectar **disciplinas pesadas** (Mat, Port, Fis, Qui, Bio) concentradas num só dia
+- ✅ Detectar **prof. sobrecarregado** (>3 tempos consecutivos, configurável)
+- ✅ Detectar **disciplina + prof. em horas más** (config `escola.horas_dificeis`, default sex 7º+8º)
+
+**Notas de implementação 4.2:**
+- Config novo em `config/escola.php`: `disciplinas_pesadas`, `max_tempos_consecutivos`, `horas_dificeis`
+- 3 getters Alpine em `resources/js/horario-editor.js`: `concentracaoDiaria`, `tempasConsecutivos`, `horasMas`
+- 3 métodos novos em `App\Services\HorarioAnalyser` espelham a mesma lógica server-side
+- Painel diagnóstico extraído para partial `resources/views/horarios/_diagnostic-panel.blade.php`, incluído em bulk-turma + bulk-professor
+- `atrPayload` enriquecido com `professor_id` e `eh_pesada` (boolean derivado da sigla)
+- 13 chaves i18n novas em pt/en
 
 #### 4.3 — Auto-gerador inicial (greedy)
 - Algoritmo guloso simples:

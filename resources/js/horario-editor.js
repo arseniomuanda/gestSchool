@@ -34,6 +34,7 @@ export function horarioEditor(opts) {
         diasLectivos: opts.diasLectivos,
         atrPayload: opts.atrPayload || {},
         turmaColors: opts.turmaColors || {},
+        diagnostico: opts.diagnostico || { max_consecutivos: 3, horas_dificeis: [] },
         mode: opts.mode || 'turma',
         i18n: opts.i18n || {},
 
@@ -158,6 +159,156 @@ export function horarioEditor(opts) {
             const actual = this.slotCountByAtr[String(atrId)] || 0;
             const info = this.atrPayload[atrId];
             return info?.carga_horaria ? actual >= info.carga_horaria : false;
+        },
+
+        // ---------- Diagnóstico de lacunas (Fase 4.1) ----------
+
+        get furos() {
+            const out = [];
+            const tempos = Object.keys(this.slots[this.diasLectivos[0]] || {})
+                .map(Number)
+                .sort((a, b) => a - b);
+            for (const dia of this.diasLectivos) {
+                const ocupados = tempos.filter((t) => this.slots[dia]?.[t]?.atribuicao_id);
+                if (ocupados.length < 2) continue;
+                const min = ocupados[0];
+                const max = ocupados[ocupados.length - 1];
+                for (const t of tempos) {
+                    if (t > min && t < max && !this.slots[dia][t].atribuicao_id) {
+                        out.push({ dia, tempo: t });
+                    }
+                }
+            }
+            return out;
+        },
+
+        get naoEscaladas() {
+            const usados = this.slotCountByAtr;
+            return Object.keys(this.atrPayload).filter((id) => !usados[id]);
+        },
+
+        get cargaIssues() {
+            const usados = this.slotCountByAtr;
+            const out = { ok: [], falta: [], excesso: [], semConfig: [] };
+            for (const [atrId, info] of Object.entries(this.atrPayload)) {
+                const actual = usados[atrId] || 0;
+                const esperada = info.carga_horaria;
+                if (esperada == null) out.semConfig.push(atrId);
+                else if (actual === esperada) out.ok.push(atrId);
+                else if (actual < esperada) out.falta.push({ atrId, actual, esperada });
+                else out.excesso.push({ atrId, actual, esperada });
+            }
+            return out;
+        },
+
+        // ---------- Análise de distribuição (Fase 4.2) ----------
+
+        /**
+         * Concentração diária por disciplina pesada. Um problema é quando >50%
+         * dos tempos de uma disciplina pesada caem no mesmo dia (e há ≥2 tempos
+         * nesse dia).
+         * @returns {Array<{disciplina: string, dia: number, dia_count: number, total: number}>}
+         */
+        get concentracaoDiaria() {
+            // contagem por (atrId, dia)
+            const matriz = {};
+            for (const dia of this.diasLectivos) {
+                for (const tempo in this.slots[dia]) {
+                    const id = this.slots[dia][tempo].atribuicao_id;
+                    if (!id) continue;
+                    const info = this.atrPayload[id];
+                    if (!info?.eh_pesada) continue;
+                    matriz[id] = matriz[id] || { porDia: {}, total: 0 };
+                    matriz[id].porDia[dia] = (matriz[id].porDia[dia] || 0) + 1;
+                    matriz[id].total++;
+                }
+            }
+            const out = [];
+            for (const [id, info] of Object.entries(matriz)) {
+                if (info.total < 2) continue;
+                for (const [dia, n] of Object.entries(info.porDia)) {
+                    if (n >= 2 && n / info.total > 0.5) {
+                        out.push({
+                            atrId: id,
+                            disciplina: this.atrPayload[id]?.disciplina_full,
+                            dia: Number(dia),
+                            dia_count: n,
+                            total: info.total,
+                        });
+                    }
+                }
+            }
+            return out;
+        },
+
+        /**
+         * Professores com runs de tempos consecutivos > max_consecutivos num dia.
+         * @returns {Array<{professor_id, professor, dia, run, start, end}>}
+         */
+        get tempasConsecutivos() {
+            const limite = this.diagnostico.max_consecutivos || 3;
+            const tempos = Object.keys(this.slots[this.diasLectivos[0]] || {})
+                .map(Number)
+                .sort((a, b) => a - b);
+            const out = [];
+            // agrupa por professor: { profId: { dia: [tempos ocupados] } }
+            const porProf = {};
+            for (const dia of this.diasLectivos) {
+                for (const t of tempos) {
+                    const id = this.slots[dia]?.[t]?.atribuicao_id;
+                    if (!id) continue;
+                    const info = this.atrPayload[id];
+                    if (!info?.professor_id) continue;
+                    const pid = info.professor_id;
+                    porProf[pid] = porProf[pid] || { name: info.professor || `#${pid}`, dias: {} };
+                    porProf[pid].dias[dia] = porProf[pid].dias[dia] || [];
+                    porProf[pid].dias[dia].push(t);
+                }
+            }
+            // detecta runs
+            for (const [pid, info] of Object.entries(porProf)) {
+                for (const [dia, listaTempos] of Object.entries(info.dias)) {
+                    listaTempos.sort((a, b) => a - b);
+                    let run = 1;
+                    let start = listaTempos[0];
+                    for (let i = 1; i < listaTempos.length; i++) {
+                        if (listaTempos[i] === listaTempos[i - 1] + 1) {
+                            run++;
+                            if (run > limite && i === listaTempos.length - 1) {
+                                out.push({ professor_id: pid, professor: info.name, dia: Number(dia), run, start, end: listaTempos[i] });
+                            }
+                        } else {
+                            if (run > limite) {
+                                out.push({ professor_id: pid, professor: info.name, dia: Number(dia), run, start, end: listaTempos[i - 1] });
+                            }
+                            run = 1;
+                            start = listaTempos[i];
+                        }
+                    }
+                    if (run > limite && !out.find((o) => o.professor_id === pid && o.dia === Number(dia) && o.start === start)) {
+                        out.push({ professor_id: pid, professor: info.name, dia: Number(dia), run, start, end: listaTempos[listaTempos.length - 1] });
+                    }
+                }
+            }
+            return out;
+        },
+
+        /**
+         * Slots em "horas difíceis" (config) ocupados por disciplina pesada.
+         * @returns {Array<{dia, tempo, disciplina, atrId}>}
+         */
+        get horasMas() {
+            const horas = this.diagnostico.horas_dificeis || [];
+            if (!horas.length) return [];
+            const out = [];
+            for (const [dia, tempo] of horas) {
+                const id = this.slots[dia]?.[tempo]?.atribuicao_id;
+                if (!id) continue;
+                const info = this.atrPayload[id];
+                if (!info?.eh_pesada) continue;
+                out.push({ dia, tempo, disciplina: info.disciplina_full, atrId: id });
+            }
+            return out;
         },
 
         cellStyle(atrId) {

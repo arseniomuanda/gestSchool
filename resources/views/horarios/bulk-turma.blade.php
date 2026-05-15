@@ -2,18 +2,26 @@
     use App\Support\TurmaColor;
     // Em bulk-turma a "turma" é única; mas usamos a mesma estrutura de payload
     // para que o componente Alpine seja reutilizável.
+    $pesadas = collect(config('escola.disciplinas_pesadas', []))->map(fn ($s) => strtoupper($s));
     $atrPayload = [];
     foreach ($atribuicoes as $a) {
+        $sigla = strtoupper((string) $a->disciplina->sigla);
         $atrPayload[$a->id] = [
             'turma_id' => $a->turma_id,
             'turma_label' => $a->turma->classe->nome . $a->turma->nome,
             'disciplina' => $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8),
             'disciplina_full' => $a->disciplina->nome,
             'professor' => \Illuminate\Support\Str::limit($a->professor->user->name, 14),
+            'professor_id' => $a->professor_id,
             'carga_horaria' => $a->disciplina->carga_horaria_semanal,
+            'eh_pesada' => $pesadas->contains($sigla),
         ];
     }
     $turmaColors = [ $turma->id => TurmaColor::for($turma->id) ];
+    $diagnosticoConfig = [
+        'max_consecutivos' => (int) config('escola.max_tempos_consecutivos', 3),
+        'horas_dificeis' => config('escola.horas_dificeis', []),
+    ];
     $i18n = [
         'column' => __('column'),
         'row' => __('row'),
@@ -45,6 +53,7 @@
             diasLectivos: {{ \Illuminate\Support\Js::from($diasLectivos) }},
             atrPayload: {{ \Illuminate\Support\Js::from($atrPayload) }},
             turmaColors: {{ \Illuminate\Support\Js::from($turmaColors) }},
+            diagnostico: {{ \Illuminate\Support\Js::from($diagnosticoConfig) }},
             mode: 'turma',
             i18n: {{ \Illuminate\Support\Js::from($i18n) }},
         })">
@@ -234,6 +243,8 @@
                     </span>
                 </div>
             </form>
+
+            @include('horarios._diagnostic-panel')
         </x-card>
 
         <x-card :title="__('Legend')">

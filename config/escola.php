@@ -43,6 +43,24 @@ return [
         8 => ['14:15', '15:00'],
     ],
 
+    // ------------- Diagnóstico de horários (Fase 4.2) -------------
+
+    // Siglas das disciplinas consideradas "pesadas" — usadas para detectar
+    // concentração (vários tempos no mesmo dia) e colocação em horas más.
+    'disciplinas_pesadas' => ['MAT', 'POR', 'FIS', 'QUI', 'BIO'],
+
+    // Nº máximo aceitável de tempos consecutivos para o mesmo professor
+    // num dia. Acima disto, o painel diagnóstico avisa "professor sobrecarregado".
+    'max_tempos_consecutivos' => 3,
+
+    // Slots considerados "más horas" — pares [dia (1-7), tempo (chave)].
+    // Por defeito: últimos tempos de sexta-feira (cansaço de fim de semana).
+    // Vazio = desactivar a verificação.
+    'horas_dificeis' => [
+        [5, 7],
+        [5, 8],
+    ],
+
     // Tipos de eventos do calendário escolar (cor hex para o calendário)
     'tipos_evento' => [
         'feriado'  => ['nome' => 'Feriado', 'cor' => '#fc5a5a'],
