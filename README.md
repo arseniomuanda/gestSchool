@@ -110,6 +110,17 @@ A aplicação fica disponível em `http://localhost:8000`.
 
 > Em alternativa ao `composer run dev`, podes correr `php artisan serve` e `npm run dev` em terminais separados.
 
+### Com Docker (PHP 8.4 + Postgres 18 + Redis + Mailpit)
+
+Se preferires não instalar PHP/Composer/Node localmente, há um setup Docker completo:
+
+```bash
+make up
+```
+
+Faz tudo (build, deps, migrations, runner com queue + pail + vite) e a app fica em `http://localhost`.
+Detalhes completos, comandos disponíveis e troubleshooting em **[docs/DOCKER.md](docs/DOCKER.md)**.
+
 ### Configurar locale para Angola
 
 No `.env`:
