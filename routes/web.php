@@ -98,6 +98,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/horarios', [HorarioController::class, 'store'])->name('horarios.store');
         Route::get('/horarios/turma/{turma}/bulk', [HorarioController::class, 'bulkTurma'])->name('horarios.bulk-turma');
         Route::post('/horarios/turma/{turma}/bulk', [HorarioController::class, 'bulkTurmaStore'])->name('horarios.bulk-turma.store');
+        Route::post('/horarios/turma/{turma}/auto-generate', [HorarioController::class, 'autoGenerate'])->name('horarios.auto-generate');
+        Route::post('/horarios/turma/{turma}/auto-generate-ai', [HorarioController::class, 'autoGenerateAi'])->name('horarios.auto-generate-ai');
         Route::get('/horarios/professor/{professor}/bulk', [HorarioController::class, 'bulkProfessor'])->name('horarios.bulk-professor');
         Route::post('/horarios/professor/{professor}/bulk', [HorarioController::class, 'bulkProfessorStore'])->name('horarios.bulk-professor.store');
         Route::get('/horarios/{horario}/edit', [HorarioController::class, 'edit'])->name('horarios.edit');

@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Ai\Agents\HorarioSugestor;
 use App\Models\AnoLectivo;
 use App\Models\Atribuicao;
 use App\Models\Horario;
 use App\Models\Professor;
 use App\Models\Turma;
+use App\Services\HorarioGenerator;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -209,6 +213,111 @@ class HorarioController extends Controller
 
         return redirect()->route('horarios.turma', $turma)
             ->with('status', sprintf(__('%d slots saved.'), count($aGravar)));
+    }
+
+    /**
+     * Devolve JSON com uma proposta de horário (greedy) para a turma.
+     * O frontend Alpine popula o state sem gravar; user revê e submete o form normal.
+     */
+    public function autoGenerate(Request $request, Turma $turma, HorarioGenerator $generator): JsonResponse
+    {
+        $grelha = $generator->propor($turma);
+        return response()->json([
+            'slots' => $grelha,
+            'unplaced' => count($generator->unplaced),
+            'method' => 'greedy',
+        ]);
+    }
+
+    /**
+     * Devolve JSON com uma proposta de horário pedida ao Gemini.
+     * Fallback gracioso se a chave não estiver definida ou o agent falhar.
+     */
+    public function autoGenerateAi(Request $request, Turma $turma): JsonResponse
+    {
+        if (! config('ai.providers.gemini.api_key') && ! env('GEMINI_API_KEY')) {
+            return response()->json(['error' => __('AI provider is not configured.')], 503);
+        }
+
+        $atribuicoes = Atribuicao::with('disciplina', 'professor.user')
+            ->where('turma_id', $turma->id)
+            ->where('ano_lectivo_id', $turma->ano_lectivo_id)
+            ->get();
+
+        $diasLectivos = config('escola.dias_lectivos', [1, 2, 3, 4, 5]);
+        $tempos = array_keys(config('escola.tempos_lectivos'));
+        sort($tempos);
+        $pesadas = collect(config('escola.disciplinas_pesadas', []))->map(fn ($s) => strtoupper($s));
+
+        $conflitos = Horario::whereHas('atribuicao', fn ($q) => $q
+                ->where('turma_id', '!=', $turma->id)
+                ->where('ano_lectivo_id', $turma->ano_lectivo_id))
+            ->with('atribuicao')
+            ->get()
+            ->map(fn ($h) => "dia={$h->dia_semana}, tempo={$h->tempo}, professor_id={$h->atribuicao->professor_id}")
+            ->implode("\n");
+
+        $atrLines = $atribuicoes->map(function ($a) use ($pesadas) {
+            $sigla = strtoupper((string) $a->disciplina->sigla);
+            $pesada = $pesadas->contains($sigla) ? 'sim' : 'não';
+            return "- id={$a->id}, disciplina={$a->disciplina->nome} ({$sigla}), professor_id={$a->professor_id}, carga={$a->disciplina->carga_horaria_semanal}, pesada={$pesada}";
+        })->implode("\n");
+
+        $prompt = <<<PROMPT
+Turma: {$turma->classe->nome}{$turma->nome}
+Dias lectivos: {$this->formatList($diasLectivos)}
+Tempos por dia: {$this->formatList($tempos)}
+
+Atribuições disponíveis (id, disciplina, professor, carga horária semanal, é pesada?):
+{$atrLines}
+
+Conflitos a evitar (professores já ocupados noutras turmas neste slot):
+{$conflitos}
+
+Devolve um array `slots` com a distribuição que respeita as regras.
+PROMPT;
+
+        try {
+            $response = (new HorarioSugestor())->prompt($prompt);
+            $slotsRaw = $response['slots'] ?? [];
+        } catch (\Throwable $e) {
+            Log::warning('HorarioSugestor falhou', ['error' => $e->getMessage(), 'turma' => $turma->id]);
+            return response()->json(['error' => __('AI suggestion failed.'), 'detail' => $e->getMessage()], 502);
+        }
+
+        // Inicializa grelha vazia e aplica só atribuições válidas
+        $validIds = $atribuicoes->pluck('id')->all();
+        $grelha = [];
+        foreach ($diasLectivos as $d) {
+            foreach ($tempos as $t) {
+                $grelha[$d][$t] = ['atribuicao_id' => '', 'sala' => ''];
+            }
+        }
+        $applied = 0;
+        $rejected = 0;
+        foreach ($slotsRaw as $s) {
+            $dia = (int) ($s['dia'] ?? 0);
+            $tempo = (int) ($s['tempo'] ?? 0);
+            $aid = (int) ($s['atribuicao_id'] ?? 0);
+            if (! in_array($dia, $diasLectivos, true)) { $rejected++; continue; }
+            if (! in_array($tempo, $tempos, true)) { $rejected++; continue; }
+            if (! in_array($aid, $validIds, true)) { $rejected++; continue; }
+            if ($grelha[$dia][$tempo]['atribuicao_id'] !== '') { $rejected++; continue; }
+            $grelha[$dia][$tempo]['atribuicao_id'] = (string) $aid;
+            $applied++;
+        }
+
+        return response()->json([
+            'slots' => $grelha,
+            'applied' => $applied,
+            'rejected' => $rejected,
+            'method' => 'gemini',
+        ]);
+    }
+
+    protected function formatList(array $arr): string
+    {
+        return implode(', ', $arr);
     }
 
     /**

@@ -35,6 +35,7 @@ export function horarioEditor(opts) {
         atrPayload: opts.atrPayload || {},
         turmaColors: opts.turmaColors || {},
         diagnostico: opts.diagnostico || { max_consecutivos: 3, horas_dificeis: [] },
+        suggestEndpoints: opts.suggestEndpoints || null,  // { greedy: url, ai: url } só na bulk-turma
         mode: opts.mode || 'turma',
         i18n: opts.i18n || {},
 
@@ -45,6 +46,11 @@ export function horarioEditor(opts) {
         sortables: [],
         dragWarning: '',
         clearAllOpen: false,        // modal de confirmação "Limpar tudo"
+        suggestOpen: false,         // modal de confirmação "Sobrescrever com sugestão"
+        pendingSuggestion: null,    // método pendente: 'greedy' | 'ai'
+        suggestLoading: false,
+        suggestError: '',
+        suggestMessage: '',
 
         init() {
             try {
@@ -415,6 +421,78 @@ export function horarioEditor(opts) {
                 }
             }
             this.clearAllOpen = false;
+        },
+
+        // ---------- Auto-sugestão de horário (Fase 4.3) ----------
+
+        /** Abre modal de confirmação se o horário já tem dados, senão aplica logo. */
+        askSuggest(method) {
+            this.suggestError = '';
+            this.suggestMessage = '';
+            this.pendingSuggestion = method;
+            // Se a grelha está vazia, aplica directamente
+            if (this.filledCount === 0) {
+                this.applySuggestion();
+            } else {
+                this.suggestOpen = true;
+            }
+        },
+
+        async applySuggestion() {
+            const method = this.pendingSuggestion;
+            this.suggestOpen = false;
+            if (!method) return;
+
+            const url = this.suggestEndpoints?.[method];
+            if (!url) {
+                this.suggestError = 'No endpoint configured for this suggestion method.';
+                return;
+            }
+            this.suggestLoading = true;
+            this.suggestError = '';
+            this.suggestMessage = '';
+
+            try {
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+                    || document.querySelector('input[name="_token"]')?.value;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf || '',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    this.suggestError = data?.error || `HTTP ${res.status}`;
+                    return;
+                }
+                // Aplicar slots devolvidos ao state Alpine
+                if (data.slots) {
+                    for (const dia of this.diasLectivos) {
+                        for (const tempo in this.slots[dia]) {
+                            const proposed = data.slots[dia]?.[tempo];
+                            if (proposed) {
+                                this.slots[dia][tempo].atribuicao_id = proposed.atribuicao_id || '';
+                                this.slots[dia][tempo].sala = proposed.sala || '';
+                            }
+                        }
+                    }
+                }
+                const parts = [];
+                if (data.method === 'greedy') parts.push(this.i18n.suggestedGreedy || 'Suggestion applied (greedy).');
+                if (data.method === 'gemini') parts.push(this.i18n.suggestedAi || 'Suggestion applied (AI).');
+                if (data.unplaced > 0) parts.push(`${data.unplaced} ${this.i18n.unplacedBlocks || 'blocks not placed.'}`);
+                if (data.rejected > 0) parts.push(`${data.rejected} ${this.i18n.rejectedSlots || 'slots rejected.'}`);
+                this.suggestMessage = parts.join(' ');
+                setTimeout(() => { this.suggestMessage = ''; }, 5000);
+            } catch (e) {
+                this.suggestError = e.message || 'Failed to fetch suggestion.';
+            } finally {
+                this.suggestLoading = false;
+                this.pendingSuggestion = null;
+            }
         },
 
         // ---------- drag & drop ----------

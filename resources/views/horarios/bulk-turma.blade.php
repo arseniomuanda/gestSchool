@@ -54,8 +54,17 @@
             atrPayload: {{ \Illuminate\Support\Js::from($atrPayload) }},
             turmaColors: {{ \Illuminate\Support\Js::from($turmaColors) }},
             diagnostico: {{ \Illuminate\Support\Js::from($diagnosticoConfig) }},
+            suggestEndpoints: {{ \Illuminate\Support\Js::from([
+                'greedy' => route('horarios.auto-generate', $turma),
+                'ai' => route('horarios.auto-generate-ai', $turma),
+            ]) }},
             mode: 'turma',
-            i18n: {{ \Illuminate\Support\Js::from($i18n) }},
+            i18n: {{ \Illuminate\Support\Js::from(array_merge($i18n, [
+                'suggestedGreedy' => __('Suggestion applied (heuristic).'),
+                'suggestedAi' => __('Suggestion applied (AI).'),
+                'unplacedBlocks' => __('blocks could not be placed.'),
+                'rejectedSlots' => __('slots rejected.'),
+            ])) }},
         })">
             <p class="text-sm text-muted mb-4">
                 {{ __('Pick the assignment for each slot. Empty cells stay free. Saving overwrites the previous schedule of this class group.') }}
@@ -82,6 +91,24 @@
                                 class="px-3 py-1 transition border-s border-gray-200">
                             {{ __('Visual mode') }}
                         </button>
+                    </div>
+                    {{-- Sugestão de horário (Fase 4.3) --}}
+                    <div class="inline-flex" x-data="{ open: false }" @click.outside="open = false">
+                        <button type="button" class="btn btn-primary btn-sm" @click="open = !open"
+                                x-bind:disabled="suggestLoading"
+                                x-bind:class="suggestLoading ? 'opacity-50 cursor-wait' : ''">
+                            <x-lucide-sparkles class="w-4 h-4" />
+                            <span x-show="!suggestLoading">{{ __('Suggest schedule') }}</span>
+                            <span x-show="suggestLoading">{{ __('Working…') }}</span>
+                        </button>
+                        <div x-show="open" x-cloak class="dropdown end-0 mt-8">
+                            <button type="button" class="dropdown-item w-full text-start" @click="askSuggest('greedy'); open = false">
+                                <x-lucide-zap class="w-3.5 h-3.5 inline" /> {{ __('Fast (heuristic)') }}
+                            </button>
+                            <button type="button" class="dropdown-item w-full text-start" @click="askSuggest('ai'); open = false">
+                                <x-lucide-bot class="w-3.5 h-3.5 inline" /> {{ __('With AI (Gemini)') }}
+                            </button>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-secondary btn-sm" @click="confirmClearAll()">
                         <x-lucide-eraser class="w-4 h-4" /> {{ __('Clear all') }}
@@ -253,6 +280,23 @@
                 :message="__('Clear the whole schedule?')"
                 :confirmLabel="__('Clear all')"
                 variant="danger" />
+
+            <x-confirm-dialog
+                show="suggestOpen"
+                onConfirm="applySuggestion()"
+                :title="__('Apply suggestion?')"
+                :message="__('This will overwrite the current schedule. You can still review and edit before saving.')"
+                :confirmLabel="__('Apply')"
+                variant="primary" />
+
+            {{-- Toast pós-sugestão --}}
+            <div x-show="suggestMessage" x-cloak class="fixed bottom-4 right-4 z-40 px-4 py-2 bg-green-50 border border-green-200 text-green-800 text-sm rounded shadow">
+                <x-lucide-check-circle class="w-4 h-4 inline" /> <span x-text="suggestMessage"></span>
+            </div>
+            <div x-show="suggestError" x-cloak class="fixed bottom-4 right-4 z-40 px-4 py-2 bg-red-50 border border-red-200 text-red-800 text-sm rounded shadow max-w-md">
+                <x-lucide-alert-triangle class="w-4 h-4 inline" /> <span x-text="suggestError"></span>
+                <button type="button" class="ms-2 underline" @click="suggestError = ''">{{ __('Dismiss') }}</button>
+            </div>
         </x-card>
 
         <x-card :title="__('Legend')">
