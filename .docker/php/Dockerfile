@@ -53,6 +53,9 @@ ENV PATH=$PATH:/composer/vendor/bin
 RUN composer config --global process-timeout 3600
 RUN composer global require "laravel/installer"
 
+# Git: confiar no working tree montado por bind mount (host UID != container root)
+RUN git config --global --add safe.directory /var/www
+
 WORKDIR /root
 RUN git clone https://github.com/seebi/dircolors-solarized
 
