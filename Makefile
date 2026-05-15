@@ -2,9 +2,9 @@
 
 # First-time bootstrap: build, install deps, key (if missing), migrate, then start dev
 up:
+	@test -d node_modules || { echo "❌ node_modules em falta. Corre 'npm install' no host primeiro (ver docs/DOCKER.md)."; exit 1; }
 	docker compose up -d --build
 	docker compose exec php composer install
-	docker compose exec php npm install
 	@docker compose exec php sh -c "[ -f .env ] || cp .env.example .env"
 	@docker compose exec php sh -c "grep -q '^APP_KEY=base64:' .env || php artisan key:generate --ansi"
 	docker compose exec php php artisan migrate --force
@@ -20,8 +20,8 @@ build:
 
 # Just install deps + migrate (no dev runner)
 setup:
+	@test -d node_modules || { echo "❌ node_modules em falta. Corre 'npm install' no host primeiro."; exit 1; }
 	docker compose exec php composer install
-	docker compose exec php npm install
 	docker compose exec php php artisan migrate --force
 
 # Start the queue/pail/vite runner (foreground)

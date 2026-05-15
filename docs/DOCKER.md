@@ -17,7 +17,7 @@ make up
 Faz tudo: build das imagens, instalação de dependências, migrations, e arranque do
 runner de desenvolvimento (queue + pail + vite).
 
-A app fica em **http://localhost**.
+A app fica em **http://localhost:8000**.
 
 ---
 
@@ -35,7 +35,7 @@ Não precisas de PHP, Composer ou Node localmente — corre tudo dentro dos cont
 | Serviço | Imagem | Porta (host) | Notas |
 |---|---|---|---|
 | `php` | build local (`php:8.4-fpm` + extensões) | 5173 | PHP-FPM, Composer, Node 22 |
-| `nginx` | `nginx` | 80 | Serve a app em `http://localhost` |
+| `nginx` | `nginx` | 8000 | Serve a app em `http://localhost:8000` |
 | `db` | `postgres:18` | 5432 | DB `gestschool` / user `gestschool` / pass `gestschool` |
 | `pgadmin` | `dpage/pgadmin4` | 5050 | UI web para o Postgres |
 | `mail` | `axllent/mailpit:latest` | 8025 (UI), 1025 (SMTP) | Captura emails enviados pela app |
@@ -45,7 +45,7 @@ Não precisas de PHP, Composer ou Node localmente — corre tudo dentro dos cont
 
 | Serviço | URL | Credenciais |
 |---|---|---|
-| App | http://localhost | (ver seeders, password `password`) |
+| App | http://localhost:8000 | (ver seeders, password `password`) |
 | Vite HMR | http://localhost:5173 | — |
 | pgAdmin | http://localhost:5050 | `admin@admin.com` / `password` |
 | Mailpit UI | http://localhost:8025 | — |
@@ -136,7 +136,7 @@ O Docker compose injecta hostnames internos para cada serviço. As variáveis cr
 no `.env` devem ficar:
 
 ```env
-APP_URL=http://localhost
+APP_URL=http://localhost:8000
 
 DB_CONNECTION=pgsql
 DB_HOST=db                 # nome do serviço, não 127.0.0.1
