@@ -5,6 +5,8 @@
 
 ---
 
+> 📜 **Conformidade legal:** ver [docs/CONFORMIDADE_DECRETO_162-23.md](./CONFORMIDADE_DECRETO_162-23.md) — auditoria face ao Decreto Presidencial n.º 162/23 com 10 gaps identificados (pausas entre tempos, intervalo no sítio errado, tempos por nível, etc). Implementação adiada.
+
 ## 🚦 Estado das fases
 
 | # | Feature | Estado | Esforço | Valor | Risco |
