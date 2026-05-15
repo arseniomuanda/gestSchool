@@ -242,6 +242,14 @@
             </form>
 
             @include('horarios._diagnostic-panel')
+
+            <x-confirm-dialog
+                show="clearAllOpen"
+                onConfirm="doClearAll()"
+                :title="__('Clear all')"
+                :message="__('Clear the whole schedule?')"
+                :confirmLabel="__('Clear all')"
+                variant="danger" />
         </x-card>
 
         {{-- Stats card --}}

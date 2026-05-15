@@ -44,6 +44,7 @@ export function horarioEditor(opts) {
         clipboardOriginLabel: '',
         sortables: [],
         dragWarning: '',
+        clearAllOpen: false,        // modal de confirmação "Limpar tudo"
 
         init() {
             try {
@@ -402,14 +403,18 @@ export function horarioEditor(opts) {
         },
 
         confirmClearAll() {
-            const msg = this.i18n.confirmClearAll || 'Clear the whole schedule?';
-            if (!confirm(msg)) return;
+            // Abre o modal inline em vez de window.confirm (rejeitado pelo UX)
+            this.clearAllOpen = true;
+        },
+
+        doClearAll() {
             for (const d of this.diasLectivos) {
                 for (const tempo in this.slots[d]) {
                     this.slots[d][tempo].atribuicao_id = '';
                     this.slots[d][tempo].sala = '';
                 }
             }
+            this.clearAllOpen = false;
         },
 
         // ---------- drag & drop ----------
