@@ -18,8 +18,12 @@
                 <h1 class="text-white text-3xl font-bold">GestSchool</h1>
                 <p class="text-sidebar-text/60 mt-2 text-sm">{{ __('School Management') }}</p>
             </div>
-            <div class="text-sidebar-text/50 text-xs">
+            <div class="text-sidebar-text/50 text-xs space-y-1">
                 <p>© {{ date('Y') }} GestSchool — {{ __('School Management') }}</p>
+                <p>
+                    {{ __('Built by') }}
+                    <a href="https://www.linkedin.com/in/ars%C3%A9nio-muanda-91808518b/" target="_blank" rel="noopener" class="text-sidebar-text/80 hover:text-white underline-offset-2 hover:underline">Arsénio Muanda</a>
+                </p>
             </div>
         </aside>
 

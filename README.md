@@ -6,8 +6,8 @@
 </p>
 
 <p align="center">
-  <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel 12"></a>
-  <a href="https://www.php.net"><img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.2+"></a>
+  <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13"></a>
+  <a href="https://www.php.net"><img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.4+"></a>
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind 4"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licen%C3%A7a-Public%20v1.0-blue.svg" alt="gestSchool Public License v1.0"></a>
   <img src="https://img.shields.io/badge/source-available-orange.svg" alt="Source Available">
@@ -16,7 +16,7 @@
 
 **TL;DR**
 - 🏫 Para Ensino de Iniciação, Base e Médio (desenhado para Angola, adaptável a outros sistemas lusófonos)
-- ⚙️ Laravel 12 + PHP 8.2 + Blade/Alpine + Tailwind 4 · SQLite por defeito
+- ⚙️ Laravel 13 + PHP 8.4 + Blade/Alpine + Tailwind 4 · SQLite por defeito
 - 👥 7 perfis pré-configurados (Director, Pedagógico, Secretário, Professor, Assistente, Encarregado, Aluno)
 - 🔓 Grátis para escolas públicas, IPSS, ONG e missões — uso comercial proibido
 - 🚧 Em desenvolvimento activo — pronto para demo/staging
@@ -68,7 +68,7 @@ educativos lusófonos.
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | PHP 8.2+, Laravel 12 |
+| Backend | PHP 8.4+, Laravel 13 |
 | Frontend | Blade + Alpine.js + Tailwind CSS 4 (Vite) |
 | Base de dados | SQLite por defeito (MySQL/PostgreSQL suportados) |
 | Autenticação | Laravel Breeze |
@@ -77,7 +77,7 @@ educativos lusófonos.
 
 ## Pré-requisitos
 
-- PHP 8.2 ou superior com extensões: `pdo_sqlite`, `mbstring`, `xml`, `bcmath`, `intl`
+- PHP 8.4 ou superior com extensões: `pdo_sqlite`, `mbstring`, `xml`, `bcmath`, `intl`
 - Composer 2.x
 - Node.js 20+ e npm
 - (opcional) MySQL 8+ ou PostgreSQL 14+ se quiseres mudar de SQLite

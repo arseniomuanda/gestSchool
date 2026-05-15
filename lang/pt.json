@@ -1,6 +1,7 @@
 {
     "Dashboard": "Painel",
     "Toggle sidebar": "Recolher menu lateral",
+    "Built by": "Construído por",
     "Search": "Pesquisar",
     "Search…": "Pesquisar…",
     "Searching…": "A pesquisar…",
@@ -500,7 +501,6 @@
     "Clipboard:": "Área de transferência:",
     "empty": "vazio",
     "clear": "limpar",
-    "Clear all": "Limpar tudo",
     "Clear the whole schedule?": "Limpar todo o horário?",
     "Column actions": "Acções da coluna",
     "Copy column": "Copiar coluna",

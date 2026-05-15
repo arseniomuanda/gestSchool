@@ -1,5 +1,6 @@
 {
     "Toggle sidebar": "Toggle sidebar",
+    "Built by": "Built by",
     "Search": "Search",
     "Search…": "Search…",
     "Searching…": "Searching…",
@@ -500,7 +501,6 @@
     "Clipboard:": "Clipboard:",
     "empty": "empty",
     "clear": "clear",
-    "Clear all": "Clear all",
     "Clear the whole schedule?": "Clear the whole schedule?",
     "Column actions": "Column actions",
     "Copy column": "Copy column",
