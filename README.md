@@ -74,6 +74,7 @@ educativos lusófonos.
 | Autenticação | Laravel Breeze |
 | Permissões | Spatie Laravel Permission |
 | Ícones | Blade Lucide Icons |
+| AI SDK | Laravel AI (Anthropic, OpenAI, Gemini, +12 providers) |
 
 ## Pré-requisitos
 
