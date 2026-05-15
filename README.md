@@ -116,6 +116,8 @@ Se preferires não instalar PHP/Composer/Node localmente, há um setup Docker co
 
 ```bash
 make start         # bootstrap + runner num único comando
+make up            # bootstrap: build + composer install + npm install + migrate
+make dev           # arranca queue + pail + vite (Ctrl+C para parar)
 ```
 
 A app fica em `http://localhost:8000`. Detalhes completos, comandos e troubleshooting em **[docs/DOCKER.md](docs/DOCKER.md)**.
