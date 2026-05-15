@@ -235,7 +235,7 @@ class HorarioController extends Controller
      */
     public function autoGenerateAi(Request $request, Turma $turma): JsonResponse
     {
-        if (! config('ai.providers.gemini.api_key') && ! env('GEMINI_API_KEY')) {
+        if (! config('ai.providers.gemini.key')) {
             return response()->json(['error' => __('AI provider is not configured.')], 503);
         }
 
