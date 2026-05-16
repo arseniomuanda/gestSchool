@@ -77,12 +77,15 @@ services:
             - 6379:6379
 
     ####################################################################################################
-    # Cloudflare Tunnel (perfil "tunnel" — só arranca via `make tunnel`)
+    # ngrok Tunnel (perfil "tunnel" — só arranca via `make tunnel`)
+    # URL fixa em NGROK_DOMAIN, autenticada via NGROK_AUTHTOKEN (ambos do .env).
     ####################################################################################################
-    cloudflared:
-        image: cloudflare/cloudflared:latest
+    ngrok:
+        image: ngrok/ngrok:latest
         profiles: [tunnel]
-        command: tunnel --no-autoupdate --url http://nginx:80
+        command: http --url=https://${NGROK_DOMAIN:?NGROK_DOMAIN tem de estar no .env} nginx:80
+        environment:
+            NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?NGROK_AUTHTOKEN tem de estar no .env}
         depends_on:
             - nginx
 

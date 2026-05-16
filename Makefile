@@ -1,7 +1,10 @@
-.PHONY: start up down build setup dev shell migrate fresh logs ps tunnel tunnel-stop
+.PHONY: start demo up down build setup dev shell migrate fresh logs ps tunnel tunnel-stop
 
 # One-shot: bootstrap + runner. Equivalente a `make up && make dev`.
 start: up dev
+
+# One-shot: bootstrap + tunnel público. Equivalente a `make up && make tunnel`.
+demo: up tunnel
 
 .PHONY: up down build setup dev shell migrate fresh logs ps
 
@@ -59,33 +62,36 @@ logs:
 ps:
 	docker compose ps
 
-# Expose the app publicly via a Cloudflare quick tunnel (URL muda em cada arranque)
-# Constrói assets primeiro (Vite HMR não funciona via tunnel) e mostra a URL pública.
+# Expõe a app publicamente via ngrok (URL fixa em NGROK_DOMAIN no .env).
+# Pára Vite dev, constrói assets estáticos (HMR não funciona via tunnel),
+# arranca ngrok com a URL fixa, ajusta APP_URL e reinicia o PHP.
 tunnel:
-	@echo "🔨 Build dos assets (Vite HMR não funciona em tunnel)…"
-	docker compose exec -T php npm run build
+	@grep -q "^NGROK_DOMAIN=." .env || { echo "❌ NGROK_DOMAIN em falta no .env"; exit 1; }
+	@grep -q "^NGROK_AUTHTOKEN=." .env || { echo "❌ NGROK_AUTHTOKEN em falta no .env"; exit 1; }
+	@echo "🛑 A parar Vite dev (se estiver activo)…"
+	@docker compose exec -T php pkill -f "concurrently|vite|queue:listen" 2>/dev/null || true
 	@docker compose exec -T php rm -f public/hot
-	@echo "🚀 A arrancar Cloudflare Tunnel…"
-	docker compose --profile tunnel up -d cloudflared
-	@echo "⏳ À espera da URL pública…"
-	@for i in 1 2 3 4 5 6 7 8 9 10; do \
-		URL=$$(docker compose logs cloudflared 2>&1 | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | head -1); \
-		if [ -n "$$URL" ]; then \
-			echo ""; \
-			echo "✅ Tunnel activo:"; \
-			echo "   $$URL"; \
-			echo ""; \
-			echo "💡 Ajusta APP_URL no .env para essa URL e reinicia o php (docker compose restart php)"; \
-			echo "   para evitar mixed-content e URLs absolutas mal geradas."; \
-			echo ""; \
-			echo "Para parar: make tunnel-stop"; \
-			exit 0; \
-		fi; \
-		sleep 2; \
-	done; \
-	echo "⚠️  URL não apareceu em 20s — verifica 'docker compose logs cloudflared'"
+	@echo "🔨 Build dos assets…"
+	docker compose exec -T php npm run build
+	@echo "🚀 A arrancar ngrok…"
+	@docker compose --profile tunnel rm -fs ngrok > /dev/null 2>&1 || true
+	docker compose --profile tunnel up -d ngrok
+	@URL="https://$$(grep '^NGROK_DOMAIN=' .env | cut -d= -f2)"; \
+		sed -i.bak "s|^APP_URL=.*|APP_URL=$$URL|" .env; \
+		rm -f .env.bak; \
+		docker compose restart php > /dev/null; \
+		sleep 3; \
+		echo ""; \
+		echo "✅ App: $$URL"; \
+		echo ""; \
+		echo "✏️  .env actualizado (APP_URL)"; \
+		echo "Para parar: make tunnel-stop"
 
-# Pára o tunnel sem mexer no resto
+# Pára o tunnel e reverte APP_URL para localhost
 tunnel-stop:
-	docker compose --profile tunnel stop cloudflared
-	docker compose --profile tunnel rm -f cloudflared
+	docker compose --profile tunnel stop ngrok 2>&1 | tail -3
+	docker compose --profile tunnel rm -f ngrok > /dev/null
+	@sed -i.bak 's|^APP_URL=.*|APP_URL=http://localhost:8000|' .env
+	@rm -f .env.bak
+	@docker compose restart php > /dev/null 2>&1 || true
+	@echo "✅ Tunnel parado. APP_URL revertido para http://localhost:8000"

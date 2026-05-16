@@ -128,11 +128,12 @@ Lança `composer dev:docker` em foreground — três processos em paralelo:
 
 | Comando | O que faz |
 |---|---|
-| `make start` | Bootstrap + runner (= `make up && make dev`) |
+| `make start` | Bootstrap + runner para dev local (= `make up && make dev`) |
+| `make demo` | Bootstrap + tunnel público (= `make up && make tunnel`) |
 | `make up` | Bootstrap (build + deps + migrate). Não arranca o runner. |
 | `make down` | Pára todos os containers |
-| `make tunnel` | Expõe a app publicamente via Cloudflare Tunnel (URL temporária) |
-| `make tunnel-stop` | Pára o tunnel sem mexer no resto |
+| `make tunnel` | Expõe a app publicamente via ngrok (URL fixa) |
+| `make tunnel-stop` | Pára o tunnel e reverte `APP_URL` para localhost |
 | `make build` | Rebuilds completos sem cache |
 | `make dev` | Arranca queue + pail + vite (foreground, `Ctrl+C` para parar) |
 | `make shell` | Abre `bash` dentro do container `php` |
@@ -273,45 +274,61 @@ Postgres na **primeira** inicialização do container (quando `data/` está vazi
 
 ---
 
-## Expor publicamente (Cloudflare Tunnel)
+## Expor publicamente (ngrok)
 
-Útil para fazer demo a colegas sem deploy. Não precisa de conta, signup ou token.
+Útil para fazer demo a colegas sem deploy. A URL é **fixa entre arranques** (graças
+ao static domain do ngrok), não precisas de partilhar uma nova cada vez.
 
 ```bash
-make tunnel        # arranca o tunnel e imprime a URL pública
-make tunnel-stop   # pára só o tunnel
+make demo          # bootstrap + ngrok num único comando (= make up && make tunnel)
+make tunnel        # só arranca ngrok (se a stack já estiver de pé)
+make tunnel-stop   # pára ngrok, reverte APP_URL para http://localhost:8000
 ```
 
-A URL fica no formato `https://random-words.trycloudflare.com` e **muda em cada
-arranque** (é um "quick tunnel" gratuito da Cloudflare, sem persistência).
+### Setup inicial (uma vez)
+
+1. Cria conta grátis em https://dashboard.ngrok.com/signup
+2. **Universal Gateway → Domains → + New Domain** — reclama o teu domínio estático
+   grátis (formato `<algo>.ngrok-free.dev`)
+3. Copia o **Authtoken** em https://dashboard.ngrok.com/get-started/your-authtoken
+4. Põe os dois no `.env` (que está no `.gitignore` — nunca vai para o repo):
+
+   ```env
+   NGROK_AUTHTOKEN=<o-teu-authtoken>
+   NGROK_DOMAIN=<o-teu-dominio>.ngrok-free.dev
+   ```
 
 ### O que `make tunnel` faz
 
-1. Constrói os assets com `npm run build` (Vite HMR não funciona via tunnel — os
+1. Valida que `NGROK_AUTHTOKEN` e `NGROK_DOMAIN` estão no `.env`
+2. Pára o Vite dev (que cria `public/hot` a apontar para `localhost:5173`)
+3. Apaga `public/hot`
+4. Constrói os assets com `npm run build` (Vite HMR não funciona via tunnel — os
    browsers remotos não conseguem alcançar `localhost:5173`)
-2. Apaga `public/hot` (em caso de o `make dev` estar a correr)
-3. Arranca o serviço `cloudflared` (no profile `tunnel`, separado do default)
-4. Faz scrape dos logs até encontrar a URL pública
+5. Arranca o serviço `ngrok` (no profile `tunnel`, separado do default)
+6. Actualiza `APP_URL` no `.env` para `https://<NGROK_DOMAIN>`
+7. Reinicia o container `php` para reler o `APP_URL`
 
-### Ajustes recomendados no `.env` durante o tunnel
+### Trusted proxies
 
 Para que os links absolutos gerados pelo Laravel (emails, redirects, asset URLs)
-saiam correctos em HTTPS:
-
-```env
-APP_URL=https://<a-tua-url>.trycloudflare.com
-```
-
-Reinicia o `php` para aplicar: `docker compose restart php`.
+saiam correctos em HTTPS, o `bootstrap/app.php` declara
+`trustProxies(at: '*')`. Sem isto, o ngrok terminaria HTTPS mas o Laravel
+geraria URLs `http://` (mixed-content blocked pelo browser).
 
 ### Limitações
 
-- URL muda em cada `make tunnel` — para URL fixa, regista um tunnel
-  permanente em [Zero Trust → Tunnels](https://one.dash.cloudflare.com/) e
-  monta-o no `cloudflared` com `--token`.
-- Sem HMR — para voltar a desenvolver com hot reload, `make tunnel-stop` + `make dev`.
-- Se a app gerar URLs absolutas com `http://localhost:8000`, é porque o
-  `APP_URL` não foi ajustado. Edita o `.env` e reinicia o `php`.
+- Sem HMR — para voltar a desenvolver com hot reload, `make tunnel-stop` + `make dev`
+- Plano grátis do ngrok mostra uma página de aviso na primeira visita (clica "Visit Site")
+- A URL é fixa mas o tunnel só está activo enquanto o container `ngrok` corre
+
+### Voltar para dev local
+
+```bash
+make tunnel-stop && make dev
+```
+
+O `tunnel-stop` reverte `APP_URL` para `http://localhost:8000` e reinicia o `php`.
 
 ---
 
