@@ -1,6 +1,7 @@
 import './bootstrap';
 import './sidebar';
 import './smart-search';
+import './encarregados-picker';
 import './horario-editor';
 
 import Alpine from 'alpinejs';

@@ -32,6 +32,18 @@ Route::get('/', fn () => view('welcome'));
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
+// Política de Privacidade — pública (Lei 22/11)
+Route::get('/privacidade', function () {
+    return view('legal.privacidade', [
+        'versao' => config('legal.lpd_versao'),
+        'dataAtualizacao' => now()->format('Y-m-d'),
+        'instituicao' => config('legal.instituicao'),
+        'dpo' => config('legal.dpo'),
+        'apd' => config('legal.apd'),
+        'retencaoAnos' => config('legal.retencao_anos'),
+    ]);
+})->name('legal.privacidade');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -46,6 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('funcionarios', FuncionarioController::class)->parameters(['funcionarios' => 'funcionario']);
         Route::resource('professores', ProfessorController::class)->parameters(['professores' => 'professor']);
         Route::resource('alunos', AlunoController::class)->parameters(['alunos' => 'aluno']);
+        Route::get('encarregados/search', [EncarregadoController::class, 'search'])->name('encarregados.search');
         Route::resource('encarregados', EncarregadoController::class)->parameters(['encarregados' => 'encarregado']);
 
         Route::resource('anos', AnoLectivoController::class)->parameters(['anos' => 'ano']);

@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Confia em qualquer proxy upstream (nginx → cloudflared, etc.) e lê
+        // X-Forwarded-Proto/Host para gerar URLs absolutas no esquema correcto.
+        // Sem isto, ao expor via tunnel HTTPS os assets saem em http:// e o
+        // browser bloqueia por mixed content.
+        $middleware->trustProxies(at: '*');
+
         // SetLocale corre como global para que funcione em qualquer rota,
         // inclusive 404 (onde o middleware do grupo web pode não correr).
         $middleware->append(\App\Http\Middleware\SetLocale::class);

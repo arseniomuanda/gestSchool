@@ -76,6 +76,16 @@ services:
         ports:
             - 6379:6379
 
+    ####################################################################################################
+    # Cloudflare Tunnel (perfil "tunnel" — só arranca via `make tunnel`)
+    ####################################################################################################
+    cloudflared:
+        image: cloudflare/cloudflared:latest
+        profiles: [tunnel]
+        command: tunnel --no-autoupdate --url http://nginx:80
+        depends_on:
+            - nginx
+
 volumes:
     db_data:
     redis_data:
