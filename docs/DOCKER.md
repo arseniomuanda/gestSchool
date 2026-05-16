@@ -131,6 +131,8 @@ Lança `composer dev:docker` em foreground — três processos em paralelo:
 | `make start` | Bootstrap + runner (= `make up && make dev`) |
 | `make up` | Bootstrap (build + deps + migrate). Não arranca o runner. |
 | `make down` | Pára todos os containers |
+| `make tunnel` | Expõe a app publicamente via Cloudflare Tunnel (URL temporária) |
+| `make tunnel-stop` | Pára o tunnel sem mexer no resto |
 | `make build` | Rebuilds completos sem cache |
 | `make dev` | Arranca queue + pail + vite (foreground, `Ctrl+C` para parar) |
 | `make shell` | Abre `bash` dentro do container `php` |
@@ -268,6 +270,48 @@ Postgres na **primeira** inicialização do container (quando `data/` está vazi
 - Criar utilizadores adicionais
 - Criar bases de dados de teste (`gestschool_test`, etc.)
 - Pré-carregar dados
+
+---
+
+## Expor publicamente (Cloudflare Tunnel)
+
+Útil para fazer demo a colegas sem deploy. Não precisa de conta, signup ou token.
+
+```bash
+make tunnel        # arranca o tunnel e imprime a URL pública
+make tunnel-stop   # pára só o tunnel
+```
+
+A URL fica no formato `https://random-words.trycloudflare.com` e **muda em cada
+arranque** (é um "quick tunnel" gratuito da Cloudflare, sem persistência).
+
+### O que `make tunnel` faz
+
+1. Constrói os assets com `npm run build` (Vite HMR não funciona via tunnel — os
+   browsers remotos não conseguem alcançar `localhost:5173`)
+2. Apaga `public/hot` (em caso de o `make dev` estar a correr)
+3. Arranca o serviço `cloudflared` (no profile `tunnel`, separado do default)
+4. Faz scrape dos logs até encontrar a URL pública
+
+### Ajustes recomendados no `.env` durante o tunnel
+
+Para que os links absolutos gerados pelo Laravel (emails, redirects, asset URLs)
+saiam correctos em HTTPS:
+
+```env
+APP_URL=https://<a-tua-url>.trycloudflare.com
+```
+
+Reinicia o `php` para aplicar: `docker compose restart php`.
+
+### Limitações
+
+- URL muda em cada `make tunnel` — para URL fixa, regista um tunnel
+  permanente em [Zero Trust → Tunnels](https://one.dash.cloudflare.com/) e
+  monta-o no `cloudflared` com `--token`.
+- Sem HMR — para voltar a desenvolver com hot reload, `make tunnel-stop` + `make dev`.
+- Se a app gerar URLs absolutas com `http://localhost:8000`, é porque o
+  `APP_URL` não foi ajustado. Edita o `.env` e reinicia o `php`.
 
 ---
 
