@@ -1,4 +1,4 @@
-.PHONY: start demo up down build setup dev shell migrate fresh logs ps tunnel tunnel-stop
+.PHONY: start demo up down build setup dev shell migrate fresh logs ps tunnel tunnel-stop backup backup-list backup-clean
 
 # One-shot: bootstrap + runner. Equivalente a `make up && make dev`.
 start: up dev
@@ -61,6 +61,18 @@ logs:
 # Show containers
 ps:
 	docker compose ps
+
+# Corre um backup da DB manualmente (também corre auto às 02:00 via scheduler)
+backup:
+	docker compose exec -T php php artisan backup:run --only-db
+
+# Lista todos os backups guardados (com tamanhos e datas)
+backup-list:
+	docker compose exec -T php php artisan backup:list
+
+# Remove backups antigos segundo a política de retenção em config/backup.php
+backup-clean:
+	docker compose exec -T php php artisan backup:clean
 
 # Expõe a app publicamente via ngrok (URL fixa em NGROK_DOMAIN no .env).
 # Pára Vite dev, constrói assets estáticos (HMR não funciona via tunnel),

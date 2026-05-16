@@ -14,7 +14,10 @@ class Nota extends Model
 
     protected function casts(): array
     {
-        return ['valor' => 'decimal:2'];
+        return [
+            'valor' => 'decimal:2',
+            'observacao' => 'encrypted',
+        ];
     }
 
     public function avaliacao(): BelongsTo

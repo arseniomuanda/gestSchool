@@ -8,9 +8,9 @@ COPY .bashrc /root/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# base build deps + PostgreSQL + SQLite + zip
+# base build deps + PostgreSQL (lib + client/pg_dump) + SQLite + zip
 RUN apt-get update \
-  && apt-get install -y build-essential zlib1g-dev curl gnupg procps vim git unzip libzip-dev libpq-dev libsqlite3-dev \
+  && apt-get install -y build-essential zlib1g-dev curl gnupg procps vim git unzip libzip-dev libpq-dev postgresql-client libsqlite3-dev \
   && docker-php-ext-install zip pdo_pgsql pgsql pdo_sqlite
 
 # intl

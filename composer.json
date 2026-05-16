@@ -12,6 +12,7 @@
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "mallardduck/blade-lucide-icons": "^1.26",
+        "spatie/laravel-backup": "^10.2",
         "spatie/laravel-permission": "^7.0"
     },
     "require-dev": {

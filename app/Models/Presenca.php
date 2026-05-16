@@ -14,6 +14,13 @@ class Presenca extends Model
         'aula_id', 'matricula_id', 'estado', 'observacao', 'registado_por',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'observacao' => 'encrypted',
+        ];
+    }
+
     public function aula(): BelongsTo
     {
         return $this->belongsTo(Aula::class);

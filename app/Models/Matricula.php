@@ -22,6 +22,7 @@ class Matricula extends Model
         return [
             'data_matricula' => 'date',
             'consentimento_lpd_em' => 'datetime',
+            'observacoes' => 'encrypted',
         ];
     }
 

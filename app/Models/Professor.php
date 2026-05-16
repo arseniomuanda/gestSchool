@@ -38,6 +38,7 @@ class Professor extends Model
             'habilitacoes' => 'encrypted',
             'especialidade' => 'encrypted',
             'morada' => 'encrypted',
+            'disciplinas' => 'encrypted',
         ];
     }
 
