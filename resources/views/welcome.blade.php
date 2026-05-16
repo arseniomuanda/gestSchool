@@ -266,11 +266,11 @@
                 <div class="ws-modules">
                     <article class="ws-module">
                         <span class="ws-module-badge ws-module-badge--green">01</span>
-                        <h3>{{ $isPt ? 'Pessoas' : 'People' }}</h3>
+                        <h3>{{ $isPt ? 'Comunidade Educativa' : 'School Community' }}</h3>
                         <ul>
-                            <li>{{ $isPt ? 'Alunos, encarregados, professores, funcionários' : 'Students, guardians, teachers, staff' }}</li>
+                            <li>{{ $isPt ? 'Alunos, Encarregados de Educação, Corpo Docente e Pessoal' : 'Students, Guardians of Education, Faculty and Staff' }}</li>
                             <li>{{ $isPt ? 'BI, naturalidade, ficha completa' : 'ID, place of birth, full record' }}</li>
-                            <li>{{ $isPt ? 'Encarregado a vários educandos' : 'Guardian linked to multiple children' }}</li>
+                            <li>{{ $isPt ? 'Encarregado ligado a vários educandos' : 'Guardian linked to multiple children' }}</li>
                         </ul>
                     </article>
                     <article class="ws-module">
