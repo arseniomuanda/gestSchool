@@ -49,8 +49,17 @@
                     @keydown="onKey($event)"
                     placeholder="{{ __('Search students, teachers, classes, subjects…') }}"
                     class="flex-1 border-0 p-0 text-base text-navy placeholder:text-body focus:outline-none focus:ring-0 bg-transparent"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    :aria-expanded="open.toString()"
                     autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
                     spellcheck="false"
+                    name="global_search"
+                    data-1p-ignore
+                    data-lpignore="true"
+                    data-form-type="other"
                 />
                 <span x-show="loading" class="text-xs text-muted">{{ __('Searching…') }}</span>
                 <kbd class="hidden sm:inline-flex" x-show="!loading">esc</kbd>

@@ -123,7 +123,15 @@
                        x-on:keydown.escape.prevent="close()"
                        placeholder="{{ $searchPlaceholder }}"
                        class="combobox-search-input"
-                       autocomplete="off" />
+                       role="combobox"
+                       aria-autocomplete="list"
+                       autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       spellcheck="false"
+                       data-1p-ignore
+                       data-lpignore="true"
+                       data-form-type="other" />
                 <kbd class="combobox-search-kbd">↵</kbd>
             </div>
 
