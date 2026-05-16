@@ -29,6 +29,37 @@ class EncarregadoController extends Controller
         return view('encarregados.create');
     }
 
+    public function search(Request $request)
+    {
+        $term = trim((string) $request->query('q', ''));
+
+        $query = Encarregado::query()
+            ->join('users', 'users.id', '=', 'encarregados.user_id')
+            ->select('encarregados.id', 'encarregados.bi', 'encarregados.profissao', 'users.name', 'users.email')
+            ->orderBy('users.name')
+            ->limit(20);
+
+        if (mb_strlen($term) >= 2) {
+            $like = '%'.$term.'%';
+            $query->where(function ($q) use ($like) {
+                $q->where('users.name', 'like', $like)
+                    ->orWhere('users.email', 'like', $like)
+                    ->orWhere('encarregados.bi', 'like', $like)
+                    ->orWhere('encarregados.profissao', 'like', $like);
+            });
+        }
+
+        return response()->json([
+            'results' => $query->get()->map(fn ($r) => [
+                'id' => $r->id,
+                'name' => $r->name,
+                'email' => $r->email,
+                'bi' => $r->bi,
+                'profissao' => $r->profissao,
+            ])->all(),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $data = $this->validateData($request);

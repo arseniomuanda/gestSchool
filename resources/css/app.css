@@ -364,6 +364,145 @@
     .situacao-em_curso { @apply text-muted; }
     .nota-negativa { @apply text-danger; }
 
+    /* ---------- ENCARREGADOS PICKER ----------
+       Multi-select com pesquisa server-side e metadata por item
+       (parentesco + principal). Inspirado em pickers de
+       Linear/Notion mas com a paleta BootstrapDash do projecto. */
+
+    .enc-picker {
+        @apply space-y-4;
+    }
+    .enc-picker-header {
+        @apply flex items-end justify-between gap-3 mb-4;
+    }
+    .enc-picker-header-count {
+        @apply text-xs text-muted mt-1;
+    }
+    .enc-picker-search {
+        @apply relative;
+    }
+    .enc-picker-input-wrap {
+        @apply flex items-center gap-2 px-3 py-2.5 border border-gray-300 rounded-input bg-white transition-all;
+    }
+    .enc-picker-input-wrap:focus-within {
+        @apply border-primary;
+        box-shadow: 0 0 0 3px rgb(0 98 255 / 0.12);
+    }
+    .enc-picker-input {
+        @apply flex-1 border-0 p-0 text-sm text-navy placeholder:text-body bg-transparent;
+    }
+    .enc-picker-input:focus {
+        @apply outline-none ring-0;
+    }
+    .enc-picker-dropdown {
+        @apply absolute left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-input z-20 overflow-hidden;
+        box-shadow: 0 12px 32px -8px rgb(0 23 55 / 0.18);
+    }
+    .enc-picker-dropdown-list {
+        @apply max-h-72 overflow-y-auto;
+    }
+    .enc-picker-option {
+        @apply w-full flex items-center gap-3 px-3 py-2.5 text-left transition;
+        @apply border-b border-gray-100 last:border-b-0;
+    }
+    .enc-picker-option:hover:not(:disabled) {
+        background-color: rgb(0 98 255 / 0.05);
+    }
+    .enc-picker-option.is-selected {
+        @apply bg-success-soft/50 cursor-default;
+    }
+    .enc-picker-option:disabled {
+        @apply opacity-70;
+    }
+    .enc-picker-avatar {
+        @apply w-9 h-9 rounded-full bg-primary-soft text-primary font-bold text-[11px] inline-flex items-center justify-center shrink-0 tracking-wide;
+    }
+    .enc-picker-option.is-selected .enc-picker-avatar {
+        @apply bg-success-soft text-success;
+    }
+    .enc-picker-option-info {
+        @apply flex-1 min-w-0;
+    }
+    .enc-picker-option-name {
+        @apply text-sm text-navy font-semibold truncate;
+    }
+    .enc-picker-option-meta {
+        @apply text-xs text-muted truncate mt-0.5;
+    }
+    .enc-picker-option-action {
+        @apply text-muted shrink-0;
+    }
+    .enc-picker-option.is-selected .enc-picker-option-action {
+        @apply text-success;
+    }
+    .enc-picker-empty {
+        @apply px-4 py-8 text-center;
+    }
+    .enc-picker-footer {
+        @apply flex items-center justify-between px-3 py-2 border-t border-gray-100 bg-gray-50/70;
+    }
+
+    /* Selected card */
+    .enc-list {
+        @apply mt-5 space-y-2;
+    }
+    .enc-card {
+        @apply relative flex items-start gap-3 px-4 py-3.5 bg-white border border-gray-200 rounded-input;
+        border-left-width: 3px;
+        border-left-color: theme('colors.primary.DEFAULT');
+        transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+    }
+    .enc-card:hover {
+        box-shadow: 0 6px 16px -6px rgb(0 23 55 / 0.12);
+    }
+    .enc-card.is-principal {
+        border-left-color: theme('colors.accent');
+        background: linear-gradient(to right, rgb(242 166 84 / 0.04), white 30%);
+    }
+    .enc-card-star {
+        @apply text-gray-300 transition shrink-0 mt-0.5;
+    }
+    .enc-card-star:hover { @apply text-accent; }
+    .enc-card-star svg { fill: none; transition: fill 180ms ease, color 180ms ease; }
+    .enc-card.is-principal .enc-card-star { @apply text-accent; }
+    .enc-card.is-principal .enc-card-star svg { fill: currentColor; }
+    .enc-card-body {
+        @apply flex-1 min-w-0;
+    }
+    .enc-card-header {
+        @apply flex items-start justify-between gap-3;
+    }
+    .enc-card-name {
+        @apply text-navy font-semibold text-sm leading-tight;
+    }
+    .enc-card-badge {
+        @apply inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/10 rounded-sm ml-2;
+    }
+    .enc-card-meta {
+        @apply text-xs text-muted mt-1 mb-3;
+    }
+    .enc-card-remove {
+        @apply w-6 h-6 inline-flex items-center justify-center text-muted hover:text-danger hover:bg-danger-soft rounded transition shrink-0;
+    }
+
+    .enc-pill-group {
+        @apply flex flex-wrap gap-1.5;
+    }
+    .enc-pill {
+        @apply px-2.5 py-1 text-xs font-semibold rounded-btn border border-gray-200 text-muted transition;
+    }
+    .enc-pill:hover {
+        @apply text-navy border-gray-300;
+    }
+    .enc-pill.is-active {
+        @apply bg-primary border-primary text-white;
+        box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.12);
+    }
+
+    .enc-empty {
+        @apply text-center py-10 border border-dashed border-gray-200 rounded-input;
+    }
+
     /* ---------- COMBOBOX (single + multi) ----------
        Componente de selecção com pesquisa, navegação por teclado
        e virtualização leve. Coerente com .form-select. */

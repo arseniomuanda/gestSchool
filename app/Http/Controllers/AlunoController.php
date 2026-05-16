@@ -31,8 +31,7 @@ class AlunoController extends Controller
 
     public function create()
     {
-        $encarregados = Encarregado::with('user')->get();
-        return view('alunos.create', compact('encarregados'));
+        return view('alunos.create');
     }
 
     public function store(Request $request)
@@ -101,9 +100,8 @@ class AlunoController extends Controller
 
     public function edit(Aluno $aluno)
     {
-        $aluno->load(['user', 'encarregados']);
-        $encarregados = Encarregado::with('user')->get();
-        return view('alunos.edit', compact('aluno', 'encarregados'));
+        $aluno->load(['user', 'encarregados.user']);
+        return view('alunos.edit', compact('aluno'));
     }
 
     public function update(Request $request, Aluno $aluno)
