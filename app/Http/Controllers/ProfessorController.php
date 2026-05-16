@@ -74,18 +74,26 @@ class ProfessorController extends Controller
 
         $anoActivo = \App\Models\AnoLectivo::activo();
 
-        // Atribuições filtradas ao ano activo (se houver)
         $atribuicoesActivas = $anoActivo
             ? $professor->atribuicoes->where('ano_lectivo_id', $anoActivo->id)
             : $professor->atribuicoes;
 
-        // Turmas onde dirige (no ano activo, se houver)
         $turmasDirigidasActivas = $anoActivo
             ? $professor->turmasDirigidas->where('ano_lectivo_id', $anoActivo->id)
             : $professor->turmasDirigidas;
 
-        // Carga horária semanal total (soma de carga_horaria_semanal das disciplinas atribuídas)
         $cargaSemanal = $atribuicoesActivas->sum(fn ($a) => (int) ($a->disciplina->carga_horaria_semanal ?? 0));
+
+        // Faltas recentes (últimas 5) + contagem do ano
+        $faltasRecentes = \App\Models\FaltaProfessor::where('professor_id', $professor->id)
+            ->orderBy('data', 'desc')
+            ->take(5)
+            ->get();
+        $faltasAnoCount = \App\Models\FaltaProfessor::where('professor_id', $professor->id)
+            ->when($anoActivo, fn ($q) => $q
+                ->whereDate('data', '>=', $anoActivo->inicio)
+                ->whereDate('data', '<=', $anoActivo->fim))
+            ->count();
 
         return view('professores.show', [
             'professor' => $professor,
@@ -93,6 +101,8 @@ class ProfessorController extends Controller
             'atribuicoesActivas' => $atribuicoesActivas,
             'turmasDirigidasActivas' => $turmasDirigidasActivas,
             'cargaSemanal' => $cargaSemanal,
+            'faltasRecentes' => $faltasRecentes,
+            'faltasAnoCount' => $faltasAnoCount,
         ]);
     }
 

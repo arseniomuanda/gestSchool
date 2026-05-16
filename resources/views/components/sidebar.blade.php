@@ -26,6 +26,7 @@
             {{-- Módulo 3 + 4 + 5: Corpo Docente e Pessoal --}}
             <x-sidebar-section :title="__('Faculty & Staff')" group="faculty-staff">
                 <x-sidebar-link :href="route('professores.index')" icon="user-cog" :active="request()->routeIs('professores.*')" :label="__('Teaching Staff')">{{ __('Teaching Staff') }}</x-sidebar-link>
+                <x-sidebar-link :href="route('faltas-professores.index')" icon="user-x" :active="request()->routeIs('faltas-professores.*')" :label="__('Teacher absences')">{{ __('Teacher absences') }}</x-sidebar-link>
                 <x-sidebar-link :href="route('funcionarios.index')" icon="briefcase" :active="request()->routeIs('funcionarios.*')" :label="__('Administrative Staff')">{{ __('Administrative Staff') }}</x-sidebar-link>
                 <x-sidebar-link href="#" icon="hard-hat" :label="__('Auxiliary Staff')" disabled :badge="__('soon')">
                     {{ __('Auxiliary Staff') }}
@@ -62,6 +63,11 @@
                 <x-sidebar-link :href="route('horarios.index')" icon="calendar-days" :active="request()->routeIs('horarios.*')" :label="__('Schedules')">
                     {{ __('Schedules') }}
                 </x-sidebar-link>
+                @if($isProf && ! $isAdmin)
+                    <x-sidebar-link :href="route('faltas-professores.index')" icon="user-x" :active="request()->routeIs('faltas-professores.*')" :label="__('My absences')">
+                        {{ __('My absences') }}
+                    </x-sidebar-link>
+                @endif
             </x-sidebar-section>
         @endif
 

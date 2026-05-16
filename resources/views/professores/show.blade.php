@@ -154,4 +154,47 @@
             </div>
         </x-card>
     @endif
+
+    {{-- Faltas ao serviço (issue #34) --}}
+    <x-card :title="__('Recent absences')">
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-xs text-muted">
+                @if($anoActivo)
+                    {{ __('Active year') }} <strong>{{ $anoActivo->codigo }}</strong>:
+                    <strong>{{ $faltasAnoCount }}</strong> {{ trans_choice(':n absence|:n absences', $faltasAnoCount, ['n' => $faltasAnoCount]) }}
+                @else
+                    {{ trans_choice(':n absence|:n absences', $faltasAnoCount, ['n' => $faltasAnoCount]) }}
+                @endif
+            </p>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('faltas-professores.index', ['professor_id' => $professor->id]) }}" class="btn-link text-xs">{{ __('See all') }}</a>
+                @can('create', App\Models\FaltaProfessor::class)
+                    <x-btn variant="primary" size="sm" icon="plus" :href="route('faltas-professores.create')">{{ __('Register absence') }}</x-btn>
+                @endcan
+            </div>
+        </div>
+        @if($faltasRecentes->isEmpty())
+            <p class="text-sm text-muted italic">{{ __('No absences recorded.') }}</p>
+        @else
+            <ul class="divide-y divide-gray-100">
+                @foreach($faltasRecentes as $f)
+                    <li class="py-2 flex items-center justify-between gap-2 text-sm">
+                        <div>
+                            <a href="{{ route('faltas-professores.show', $f) }}" class="text-navy hover:text-primary">
+                                {{ $f->data->format('d/m/Y') }} · {{ $f->tempo_inicio }}º–{{ $f->tempo_fim }}º
+                            </a>
+                            @switch($f->tipo)
+                                @case('justificada')<x-badge variant="success">{{ __('Justified') }}</x-badge>@break
+                                @case('injustificada')<x-badge variant="danger">{{ __('Unjustified') }}</x-badge>@break
+                                @case('licenca')<x-badge variant="info">{{ __('Leave') }}</x-badge>@break
+                            @endswitch
+                        </div>
+                        @if($f->substituto)
+                            <span class="text-xs text-muted">{{ __('Substitute') }}: {{ $f->substituto->user->name }}</span>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </x-card>
 </x-app-layout>

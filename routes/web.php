@@ -73,6 +73,12 @@ Route::middleware('auth')->group(function () {
 
     // Acesso para direcção + professores
     Route::middleware('role:director_geral|director_pedagogico|secretario|professor|professor_assistente')->group(function () {
+        // Faltas dos professores ao serviço (issue #34) — Policy controla CRUD vs view-self
+        Route::resource('faltas-professores', \App\Http\Controllers\FaltaProfessorController::class)
+            ->parameters(['faltas-professores' => 'falta']);
+        Route::post('faltas-professores/{falta}/justify', [\App\Http\Controllers\FaltaProfessorController::class, 'justify'])
+            ->name('faltas-professores.justify');
+
         Route::resource('aulas', AulaController::class)->parameters(['aulas' => 'aula']);
         Route::get('/aulas/{aula}/presencas', [PresencaController::class, 'folha'])->name('presencas.folha');
         Route::post('/aulas/{aula}/presencas', [PresencaController::class, 'gravar'])->name('presencas.gravar');
