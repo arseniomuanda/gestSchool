@@ -21,10 +21,24 @@ class HorarioController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
+
+        // Professor/Assistente: só turmas onde lecciona ou é director de turma.
+        // Direcção: todas. Encarregado/aluno: nunca chegam aqui (middleware).
         $turmas = Turma::with(['classe', 'curso', 'anoLectivo'])
+            ->when($user->hasAnyRole(['professor', 'professor_assistente']), function ($q) use ($user) {
+                $prof = $user->professor;
+                if (! $prof) {
+                    $q->whereRaw('1 = 0');   // nenhuma turma se prof. não está ligado a um Professor
+                    return;
+                }
+                $q->where(function ($w) use ($prof) {
+                    $w->where('director_turma_id', $prof->id)
+                        ->orWhereHas('atribuicoes', fn ($a) => $a->where('professor_id', $prof->id));
+                });
+            })
             ->orderBy('classe_id')->orderBy('nome')->get();
 
-        $user = $request->user();
         $professores = Professor::with('user')
             ->when($user->hasAnyRole(['professor', 'professor_assistente']), function ($q) use ($user) {
                 if ($prof = $user->professor) $q->where('id', $prof->id);
@@ -36,6 +50,7 @@ class HorarioController extends Controller
 
     public function turma(Request $request, Turma $turma)
     {
+        $this->authorize('viewHorario', $turma);
         $turma->load(['classe', 'curso', 'anoLectivo']);
 
         $horarios = Horario::whereHas('atribuicao', fn ($q) => $q->where('turma_id', $turma->id))
@@ -48,6 +63,7 @@ class HorarioController extends Controller
 
     public function professor(Request $request, Professor $professor)
     {
+        $this->authorize('viewHorario', $professor);
         $professor->load('user');
 
         $horarios = Horario::whereHas('atribuicao', fn ($q) => $q->where('professor_id', $professor->id))
@@ -442,6 +458,7 @@ PROMPT;
 
     public function turmaPdf(Request $request, Turma $turma)
     {
+        $this->authorize('viewHorario', $turma);
         $turma->load(['classe', 'curso', 'anoLectivo']);
         $horarios = Horario::whereHas('atribuicao', fn ($q) => $q->where('turma_id', $turma->id))
             ->with(['atribuicao.disciplina', 'atribuicao.professor.user'])
@@ -461,6 +478,7 @@ PROMPT;
 
     public function professorPdf(Request $request, Professor $professor)
     {
+        $this->authorize('viewHorario', $professor);
         $professor->load('user');
         $horarios = Horario::whereHas('atribuicao', fn ($q) => $q->where('professor_id', $professor->id))
             ->with(['atribuicao.turma.classe', 'atribuicao.turma.curso', 'atribuicao.disciplina'])
