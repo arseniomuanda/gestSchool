@@ -92,6 +92,12 @@
     .sidebar-link > span {
         @apply truncate;
     }
+    .sidebar-link.is-disabled {
+        @apply opacity-50 cursor-not-allowed pointer-events-none;
+    }
+    .sidebar-badge {
+        @apply text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-sidebar-text/20 text-sidebar-text/80 ms-auto shrink-0;
+    }
 
     /* Collapsible section header (clickable) */
     .sb-group {
