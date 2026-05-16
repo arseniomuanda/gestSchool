@@ -44,12 +44,14 @@ Não precisas de PHP, Composer ou Node localmente — corre tudo dentro dos cont
 
 | Serviço | Imagem | Porta (host) | Notas |
 |---|---|---|---|
-| `php` | build local (`php:8.4-fpm` + extensões) | 5173 | PHP-FPM, Composer, Node 22 |
+| `php` | build local (`php:8.4-fpm` + extensões) | 5173 | PHP-FPM, Composer, Node 22, `pg_dump 18` |
 | `nginx` | `nginx` | 8000 | Serve a app em `http://localhost:8000` |
 | `db` | `postgres:18` | 5432 | DB `gestschool` / user `gestschool` / pass `gestschool` |
 | `pgadmin` | `dpage/pgadmin4` | 5050 | UI web para o Postgres |
 | `mail` | `axllent/mailpit:latest` | 8025 (UI), 1025 (SMTP) | Captura emails enviados pela app |
 | `redis` | `redis:latest` | 6379 | Cache / sessões / queue |
+| `scheduler` | build local (mesma do `php`) | — | Corre `php artisan schedule:work` 24/7 (backups, jobs agendados) |
+| `ngrok` | `ngrok/ngrok:latest` (profile `tunnel`) | — | Tunnel público para demos (`make tunnel`) |
 
 ### URLs
 
@@ -66,6 +68,12 @@ Não precisas de PHP, Composer ou Node localmente — corre tudo dentro dos cont
 
 > O `pdo_sqlite` está incluído para que possas correr o projecto contra SQLite caso
 > queiras (basta mudar `DB_CONNECTION` no `.env`).
+
+### Binários extra incluídos
+
+- `pg_dump` 18 (instalado do repo oficial PGDG, para corresponder ao server `postgres:18`)
+- `node` 22 + `npm` 10+
+- `composer` 2 + `laravel/installer` global
 
 ---
 
@@ -142,6 +150,9 @@ Lança `composer dev:docker` em foreground — três processos em paralelo:
 | `make logs` | Tail dos logs de todos os containers |
 | `make ps` | Lista os containers em execução |
 | `make setup` | Reinstala deps e corre migrations (sem dev runner) |
+| `make backup` | Corre um backup da DB manualmente (zip em `storage/app/private/GestSchool/`) |
+| `make backup-list` | Lista todos os backups guardados (datas + tamanhos) |
+| `make backup-clean` | Remove backups antigos segundo a política de retenção |
 
 ### Comandos directos
 
@@ -329,6 +340,85 @@ make tunnel-stop && make dev
 ```
 
 O `tunnel-stop` reverte `APP_URL` para `http://localhost:8000` e reinicia o `php`.
+
+---
+
+## Backups automáticos da base de dados
+
+Usamos [`spatie/laravel-backup`](https://spatie.be/docs/laravel-backup) com um container
+`scheduler` dedicado que corre `php artisan schedule:work` 24/7 — sem dependência do cron
+do host, sem precisar de invocar nada externamente.
+
+### Onde ficam os backups
+
+```
+storage/app/private/GestSchool/
+└── 2026-05-16-23-49-37.zip          # cada backup contém um dump .sql do Postgres
+```
+
+Esta pasta está bind-mounted no container, portanto os ficheiros aparecem directamente
+na tua máquina (Finder/Explorer) sem precisares de descarregar nada. Para abrir:
+
+```bash
+unzip storage/app/private/GestSchool/2026-05-16-23-49-37.zip
+# extrai db-dumps/pgsql-gestschool.sql
+```
+
+### Schedule
+
+Definido em `routes/console.php`:
+
+| Hora | Comando | O que faz |
+|---|---|---|
+| `01:30` | `backup:clean` | Apaga backups antigos segundo a política de retenção |
+| `02:00` | `backup:run --only-db` | Cria novo dump da DB |
+
+### Comandos manuais
+
+```bash
+make backup          # corre um backup agora (não espera pelas 02:00)
+make backup-list     # mostra todos os backups + tamanhos + datas
+make backup-clean    # força limpeza de antigos
+```
+
+### Política de retenção (default `spatie/laravel-backup`)
+
+| Janela | Mantém |
+|---|---|
+| Últimos 7 dias | Todos |
+| Últimas 16 semanas | 1 por dia |
+| Últimos 8 meses | 1 por semana |
+| Últimos 4 anos | 1 por mês |
+| Últimos 2 anos | 1 por ano |
+| **Limite total** | 5 GB |
+
+Tudo configurável em `config/backup.php` → `cleanup.default_strategy`.
+
+### Porquê `postgresql-client-18` do repo PGDG?
+
+O Debian 13 (base do `php:8.4-fpm`) traz `pg_dump` 17 por defeito, mas o nosso server
+Postgres é 18 — `pg_dump` 17 recusa-se a dumpar de um server mais recente
+(`server version mismatch`). O Dockerfile adiciona o repo APT oficial do PostgreSQL
+e instala `postgresql-client-18` para garantir paridade de versão.
+
+### Adicionar storage de ficheiros ao backup
+
+Por defeito só fazemos backup da DB (o código está em git, os assets reconstroem-se).
+Se quiseres incluir uploads de utilizadores, edita `config/backup.php`:
+
+```php
+'include' => [
+    storage_path('app/public'),    // uploads públicos
+    storage_path('app/private'),   // ficheiros privados
+],
+```
+
+E muda o `make backup` para `php artisan backup:run` (sem `--only-db`).
+
+### Notificações (opcional)
+
+O `spatie/laravel-backup` suporta envio de alertas (Mail, Slack, Discord, …) quando
+um backup falha ou tem demasiado tempo. Ver secção `notifications` em `config/backup.php`.
 
 ---
 
