@@ -14,11 +14,15 @@ class Matricula extends Model
     protected $fillable = [
         'aluno_id', 'turma_id', 'ano_lectivo_id', 'numero_matricula',
         'data_matricula', 'estado', 'observacoes',
+        'consentimento_lpd_em', 'consentimento_lpd_versao',
     ];
 
     protected function casts(): array
     {
-        return ['data_matricula' => 'date'];
+        return [
+            'data_matricula' => 'date',
+            'consentimento_lpd_em' => 'datetime',
+        ];
     }
 
     public function aluno(): BelongsTo

@@ -35,6 +35,14 @@
                 <x-flash />
                 {{ $slot }}
             </div>
+
+            <footer class="px-6 py-4 mt-8 border-t border-gray-100 text-xs text-muted flex flex-wrap items-center justify-between gap-2">
+                <span>© {{ date('Y') }} {{ config('app.name') }}</span>
+                <a href="{{ route('legal.privacidade') }}" class="hover:text-primary inline-flex items-center gap-1">
+                    <x-lucide-shield class="w-3 h-3" />
+                    {{ __('Privacy Policy') }}
+                </a>
+            </footer>
         </main>
     </div>
 

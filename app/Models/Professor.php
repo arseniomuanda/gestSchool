@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Professor extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'professores';
 
@@ -33,6 +34,10 @@ class Professor extends Model
             'data_nascimento' => 'date',
             'data_admissao' => 'date',
             'assistente' => 'boolean',
+            'bi' => 'encrypted',
+            'habilitacoes' => 'encrypted',
+            'especialidade' => 'encrypted',
+            'morada' => 'encrypted',
         ];
     }
 

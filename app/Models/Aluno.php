@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Aluno extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'alunos';
 
@@ -33,6 +34,13 @@ class Aluno extends Model
     {
         return [
             'data_nascimento' => 'date',
+            // PII encriptada em repouso (Lei 22/11). Trade-off: estes campos
+            // deixam de suportar WHERE/ORDER BY/LIKE — escolhidos só os que
+            // nunca são alvo de queries directas.
+            'bi' => 'encrypted',
+            'naturalidade' => 'encrypted',
+            'morada' => 'encrypted',
+            'observacoes' => 'encrypted',
         ];
     }
 

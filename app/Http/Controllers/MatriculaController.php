@@ -44,6 +44,7 @@ class MatriculaController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateData($request);
+        $data = $this->applyConsentimento($request, $data);
         Matricula::create($data);
         return redirect()->route('matriculas.index')->with('status', __('Resource created successfully.'));
     }
@@ -62,6 +63,7 @@ class MatriculaController extends Controller
     public function update(Request $request, Matricula $matricula)
     {
         $data = $this->validateData($request, $matricula);
+        $data = $this->applyConsentimento($request, $data, $matricula);
         $matricula->update($data);
         return redirect()->route('matriculas.index')->with('status', __('Resource updated successfully.'));
     }
@@ -84,6 +86,11 @@ class MatriculaController extends Controller
     protected function validateData(Request $request, ?Matricula $matricula = null): array
     {
         $id = $matricula?->id;
+        $versaoActual = config('legal.lpd_versao');
+        $consentimentoExistenteValido = $matricula
+            && $matricula->consentimento_lpd_em !== null
+            && $matricula->consentimento_lpd_versao === $versaoActual;
+
         return $request->validate([
             'aluno_id' => ['required', Rule::exists('alunos', 'id')],
             'turma_id' => ['required', Rule::exists('turmas', 'id')],
@@ -92,6 +99,32 @@ class MatriculaController extends Controller
             'data_matricula' => ['required', 'date'],
             'estado' => ['required', Rule::in(['activa', 'transferido', 'desistente', 'aprovado', 'reprovado'])],
             'observacoes' => ['nullable', 'string'],
+            // Consentimento LPD obrigatório se não há um actual válido na matrícula
+            'consentimento_lpd' => [$consentimentoExistenteValido ? 'nullable' : 'accepted'],
         ]);
+    }
+
+    /**
+     * Aplica os campos de consentimento LPD ao payload de gravação.
+     * Só carimba se o checkbox vier marcado e (a) primeira vez ou
+     * (b) versão da política mudou.
+     */
+    protected function applyConsentimento(Request $request, array $data, ?Matricula $matricula = null): array
+    {
+        // Tirar o flag do array — não é coluna directa
+        unset($data['consentimento_lpd']);
+
+        $versaoActual = config('legal.lpd_versao');
+        $aceitou = (bool) $request->boolean('consentimento_lpd');
+        $jaConsentiuComVersaoActual = $matricula
+            && $matricula->consentimento_lpd_em !== null
+            && $matricula->consentimento_lpd_versao === $versaoActual;
+
+        if ($aceitou && ! $jaConsentiuComVersaoActual) {
+            $data['consentimento_lpd_em'] = now();
+            $data['consentimento_lpd_versao'] = $versaoActual;
+        }
+
+        return $data;
     }
 }

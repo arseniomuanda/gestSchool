@@ -169,7 +169,9 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Secure cookies por defeito em produção (Lei 22/11 — protecção em trânsito).
+    // Override explícito via SESSION_SECURE_COOKIE no .env se necessário.
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
 
     /*
     |--------------------------------------------------------------------------
