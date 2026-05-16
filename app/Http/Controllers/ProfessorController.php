@@ -61,8 +61,39 @@ class ProfessorController extends Controller
 
     public function show(Professor $professor)
     {
-        $professor->load('user');
-        return view('professores.show', compact('professor'));
+        $professor->load([
+            'user',
+            'atribuicoes.turma.classe',
+            'atribuicoes.turma.curso',
+            'atribuicoes.turma.anoLectivo',
+            'atribuicoes.disciplina',
+            'atribuicoes.anoLectivo',
+            'turmasDirigidas.classe',
+            'turmasDirigidas.anoLectivo',
+        ]);
+
+        $anoActivo = \App\Models\AnoLectivo::activo();
+
+        // Atribuições filtradas ao ano activo (se houver)
+        $atribuicoesActivas = $anoActivo
+            ? $professor->atribuicoes->where('ano_lectivo_id', $anoActivo->id)
+            : $professor->atribuicoes;
+
+        // Turmas onde dirige (no ano activo, se houver)
+        $turmasDirigidasActivas = $anoActivo
+            ? $professor->turmasDirigidas->where('ano_lectivo_id', $anoActivo->id)
+            : $professor->turmasDirigidas;
+
+        // Carga horária semanal total (soma de carga_horaria_semanal das disciplinas atribuídas)
+        $cargaSemanal = $atribuicoesActivas->sum(fn ($a) => (int) ($a->disciplina->carga_horaria_semanal ?? 0));
+
+        return view('professores.show', [
+            'professor' => $professor,
+            'anoActivo' => $anoActivo,
+            'atribuicoesActivas' => $atribuicoesActivas,
+            'turmasDirigidasActivas' => $turmasDirigidasActivas,
+            'cargaSemanal' => $cargaSemanal,
+        ]);
     }
 
     public function edit(Professor $professor)

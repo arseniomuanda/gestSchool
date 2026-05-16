@@ -50,4 +50,20 @@ class Professor extends Model
     {
         return $this->hasMany(Atribuicao::class);
     }
+
+    /** Turmas onde este professor é director de turma. */
+    public function turmasDirigidas(): HasMany
+    {
+        return $this->hasMany(Turma::class, 'director_turma_id');
+    }
+
+    /**
+     * Antiguidade em anos (anos completos desde data_admissao).
+     * Devolve null se a data não está definida.
+     */
+    public function getAntiguidadeAttribute(): ?int
+    {
+        if (! $this->data_admissao) return null;
+        return $this->data_admissao->diffInYears(now());
+    }
 }
