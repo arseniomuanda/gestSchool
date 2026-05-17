@@ -25,3 +25,7 @@ Thumbs.db
 
 # Notas pessoais (Obsidian)
 GestSchool_Obsidian/
+
+# Backups locais (editores, scripts) — nunca devem ir para o repo
+*.bak
+ombalaOpenAPI.json

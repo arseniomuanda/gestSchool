@@ -108,6 +108,11 @@
                 <x-sidebar-link :href="route('users.index')" icon="users" :active="request()->routeIs('users.*')" :label="__('Users')">
                     {{ __('Users') }}
                 </x-sidebar-link>
+                @if($isDirectorGeral)
+                    <x-sidebar-link :href="route('notificacoes.index')" icon="bell" :active="request()->routeIs('notificacoes.*')" :label="__('Notifications')">
+                        {{ __('Notifications') }}
+                    </x-sidebar-link>
+                @endif
             </x-sidebar-section>
         @endif
     </nav>

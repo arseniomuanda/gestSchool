@@ -233,7 +233,7 @@ composer test
 - [x] Horários com bulk editor por turma e por professor (copy-paste, clipboard persistente, validação de conflitos)
 - [x] Drag & drop no editor de horários (modo visual com SortableJS, toggle Form ↔ Visual)
 - [ ] Sugestões automáticas de horário (heurísticas / lacunas)
-- [ ] Notificações por email/SMS para encarregados
+- [x] Notificações por email para encarregados (Fase A: SMTP via DB, 3 triggers — comunicado, boletim, faltas excessivas; SMS Ombala em stub aguarda spec)
 - [ ] Estatísticas e dashboards analíticos
 - [ ] API REST pública para integrações
 - [ ] App móvel para encarregados (Flutter)

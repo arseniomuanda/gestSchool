@@ -61,6 +61,10 @@ return [
         [5, 8],
     ],
 
+    // Notificação automática ao encarregado quando aluno acumula faltas
+    'faltas_excessivas_limite' => 10,
+    'faltas_excessivas_cooldown_dias' => 14,
+
     // Tipos de eventos do calendário escolar (cor hex para o calendário)
     'tipos_evento' => [
         'feriado'  => ['nome' => 'Feriado', 'cor' => '#fc5a5a'],

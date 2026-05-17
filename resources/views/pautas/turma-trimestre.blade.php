@@ -4,6 +4,22 @@
             <x-turma-label :turma="$turma" :showAno="true" /> · {{ $trimestre->numero }}º {{ __('Term') }}
         </x-slot>
         <x-slot name="actions">
+            @role('director_geral|director_pedagogico')
+                <x-btn type="button" variant="secondary" icon="mail"
+                       x-on:click="$dispatch('open-modal','notify-boletim')">{{ __('Notify guardians') }}</x-btn>
+
+                <x-modal name="notify-boletim" maxWidth="lg">
+                    <form method="POST" action="{{ route('pautas.turma-trimestre.notificar', ['turma' => $turma, 'trimestre' => $trimestre]) }}" class="p-6">
+                        @csrf
+                        <h3 class="text-lg font-semibold text-navy mb-2">{{ __('Notify guardians') }}</h3>
+                        <p class="text-sm text-muted mb-4">{{ __('Send an email to the guardians of every student in this class, informing the trimester report is available.') }}</p>
+                        <div class="flex justify-end gap-2">
+                            <x-btn type="button" variant="secondary" x-on:click="$dispatch('close-modal','notify-boletim')">{{ __('Cancel') }}</x-btn>
+                            <x-btn type="submit" variant="primary" icon="send">{{ __('Send') }}</x-btn>
+                        </div>
+                    </form>
+                </x-modal>
+            @endrole
             <x-btn variant="danger" icon="file-down" :href="route('pautas.turma-trimestre.pdf', ['turma' => $turma, 'trimestre' => $trimestre])">{{ __('Export PDF') }}</x-btn>
             <x-btn variant="secondary" :href="route('pautas.index')">{{ __('Back') }}</x-btn>
         </x-slot>

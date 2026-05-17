@@ -12,3 +12,6 @@ Artisan::command('inspire', function () {
 // Os ficheiros ficam em storage/app/private/gestschool/ (visível no host via bind mount).
 Schedule::command('backup:clean')->daily()->at('01:30');
 Schedule::command('backup:run --only-db')->daily()->at('02:00');
+
+// Notificações automáticas: alunos com faltas excessivas → encarregados
+Schedule::command('notifications:faltas-excessivas')->dailyAt('19:00');

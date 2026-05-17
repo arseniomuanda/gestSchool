@@ -104,6 +104,9 @@ Route::middleware('auth')->group(function () {
 
         // PDFs
         Route::get('/pautas/disciplina/{atribuicao}/{trimestre}/pdf', [PautaController::class, 'disciplinaPdf'])->name('pautas.disciplina.pdf');
+        Route::post('/pautas/turma/{turma}/trimestre/{trimestre}/notificar', [PautaController::class, 'notificarBoletim'])
+            ->middleware('role:director_geral|director_pedagogico')
+            ->name('pautas.turma-trimestre.notificar');
         Route::get('/pautas/turma/{turma}/trimestre/{trimestre}/pdf', [PautaController::class, 'turmaTrimestrePdf'])->name('pautas.turma-trimestre.pdf');
         Route::get('/pautas/turma/{turma}/anual/pdf', [PautaController::class, 'turmaAnualPdf'])->name('pautas.turma-anual.pdf');
         Route::get('/pautas/turma/{turma}/situacao/pdf', [PautaController::class, 'situacaoPdf'])->name('pautas.situacao.pdf');
@@ -152,6 +155,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/boletim/{matricula}/pdf', [BoletimController::class, 'pdf'])->name('boletim.pdf');
 
     Route::resource('comunicados', ComunicadoController::class)->parameters(['comunicados' => 'comunicado']);
+
+    // Notificações por email/SMS (issue: roadmap "Notificações por email/SMS")
+    Route::prefix('notificacoes')->name('notificacoes.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\NotificacaoController::class, 'index'])->name('index');
+        Route::get('/settings', [\App\Http\Controllers\Admin\NotificacaoController::class, 'settings'])->name('settings');
+        Route::post('/settings/email/test', [\App\Http\Controllers\Admin\NotificacaoController::class, 'sendTestEmail'])->name('settings.email.test');
+        Route::get('/historico', [\App\Http\Controllers\Admin\NotificacaoController::class, 'historico'])->name('historico');
+        Route::get('/templates', [\App\Http\Controllers\Admin\NotificacaoController::class, 'templatesIndex'])->name('templates.index');
+        Route::get('/templates/{template}/edit', [\App\Http\Controllers\Admin\NotificacaoController::class, 'templatesEdit'])->name('templates.edit');
+        Route::put('/templates/{template}', [\App\Http\Controllers\Admin\NotificacaoController::class, 'templatesUpdate'])->name('templates.update');
+        Route::get('/sms-creditos', [\App\Http\Controllers\Admin\NotificacaoController::class, 'smsCreditos'])->name('sms-creditos');
+        Route::post('/sms-creditos', [\App\Http\Controllers\Admin\NotificacaoController::class, 'smsCreditosStore'])->name('sms-creditos.store');
+    });
 
     Route::middleware('role:professor|professor_assistente')->group(function () {
         Route::get('/meus-alunos', [AlunoController::class, 'index'])->name('meus-alunos.index');

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 
 class Comunicado extends Model
 {
@@ -39,6 +40,57 @@ class Comunicado extends Model
     public function scopePublicados(Builder $query): Builder
     {
         return $query->whereNotNull('publicado_em')->where('publicado_em', '<=', now());
+    }
+
+    /**
+     * Destinatários (Users) do comunicado para notificações por email/SMS.
+     * Filtra por alcance: todos / professores / encarregados / classe / turma.
+     */
+    public function destinatariosUsers(): Collection
+    {
+        $userIds = collect();
+
+        switch ($this->alcance) {
+            case 'todos':
+                $userIds = User::query()->pluck('id');
+                break;
+
+            case 'professores':
+                $userIds = User::role(['professor', 'professor_assistente'])->pluck('id');
+                break;
+
+            case 'encarregados':
+                $userIds = User::role('encarregado')->pluck('id');
+                break;
+
+            case 'classe':
+                if ($this->classe_id) {
+                    $alunoIds = \App\Models\Matricula::query()
+                        ->whereHas('turma', fn ($q) => $q->where('classe_id', $this->classe_id))
+                        ->where('estado', 'activa')
+                        ->pluck('aluno_id');
+                    $userIds = \App\Models\Encarregado::query()
+                        ->whereHas('alunos', fn ($q) => $q->whereIn('alunos.id', $alunoIds))
+                        ->pluck('user_id')
+                        ->filter();
+                }
+                break;
+
+            case 'turma':
+                if ($this->turma_id) {
+                    $alunoIds = \App\Models\Matricula::query()
+                        ->where('turma_id', $this->turma_id)
+                        ->where('estado', 'activa')
+                        ->pluck('aluno_id');
+                    $userIds = \App\Models\Encarregado::query()
+                        ->whereHas('alunos', fn ($q) => $q->whereIn('alunos.id', $alunoIds))
+                        ->pluck('user_id')
+                        ->filter();
+                }
+                break;
+        }
+
+        return User::query()->whereIn('id', $userIds->unique())->get();
     }
 
     public function scopeVisivelPara(Builder $query, User $user): Builder

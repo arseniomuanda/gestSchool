@@ -8,6 +8,8 @@ use App\Models\Avaliacao;
 use App\Models\Matricula;
 use App\Models\Trimestre;
 use App\Models\Turma;
+use App\Models\Encarregado;
+use App\Services\Notifications\NotificationSender;
 use App\Services\PautaCalculator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -248,6 +250,43 @@ class PautaController extends Controller
             'agrupado' => $agrupado,
             'calc' => $calc,
         ];
+    }
+
+    /**
+     * Notifica os encarregados dos alunos da turma de que o boletim do
+     * trimestre está disponível. Dispara o evento 'boletim_fechado'.
+     */
+    public function notificarBoletim(Request $request, Turma $turma, Trimestre $trimestre)
+    {
+        $turma->load('classe');
+        $matriculas = $this->matriculasDaTurma($turma->id, $turma->ano_lectivo_id);
+        $sender = app(NotificationSender::class);
+        $totalEnviado = 0;
+
+        foreach ($matriculas as $m) {
+            $encarregadoUsers = Encarregado::query()
+                ->whereHas('alunos', fn ($q) => $q->whereKey($m->aluno_id))
+                ->with('user')
+                ->get()
+                ->pluck('user')
+                ->filter();
+
+            if ($encarregadoUsers->isEmpty()) continue;
+
+            $result = $sender->dispatch(
+                eventKey: 'boletim_fechado',
+                recipients: $encarregadoUsers,
+                channels: ['email'],
+                payload: [
+                    'aluno' => $m->aluno->user->name ?? '—',
+                    'trimestre' => $trimestre->numero,
+                    'turma' => $turma->classe->nome.' '.$turma->nome,
+                ],
+            );
+            $totalEnviado += $result['sent'] ?? 0;
+        }
+
+        return back()->with('status', __(':n notification(s) sent to guardians.', ['n' => $totalEnviado]));
     }
 
     // ----- helpers -----
