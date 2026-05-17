@@ -6,6 +6,13 @@
 *.md diff=markdown
 *.php diff=php
 
+# i18n JSON: ambos os lados de um conflito são preservados.
+# Combinado com bin/normalize-lang.sh (pre-commit hook) que ordena
+# alfabeticamente e remove duplicados, isto elimina ~95% dos conflitos.
+# Ver docs em CONTRIBUTING.md → "Conflitos em lang/*.json".
+lang/*.json merge=union
+
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+ 

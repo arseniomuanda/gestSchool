@@ -277,6 +277,34 @@ Para corrigir traduções existentes, abre PR com label `i18n`.
 
 Línguas que adoraríamos ver: **Kimbundu**, **Umbundu**, **Kikongo**, **Francês**.
 
+### Conflitos em `lang/*.json` (importante)
+
+Os ficheiros JSON de tradução conflictavam com frequência quando duas branches
+adicionavam chaves em paralelo (ambas inseriam "no fim" do array). Temos agora
+**duas defesas combinadas**:
+
+**1. `.gitattributes` com `merge=union`** — automático, em todos os clones:
+em conflitos, o git **junta ambos os lados** em vez de marcar conflito.
+
+**2. Script `bin/normalize-lang.sh`** — ordena alfabeticamente, remove
+duplicados e valida JSON. Corre manualmente sempre que mexeres em `lang/*.json`:
+
+```bash
+bin/normalize-lang.sh
+git add lang/*.json
+```
+
+**Para garantir que nunca te esqueces**, instala-o como hook `pre-commit` local
+(simbolic link, não vai para git):
+
+```bash
+ln -sf ../../bin/normalize-lang.sh .git/hooks/pre-commit
+```
+
+A partir daí, cada `git commit` normaliza automaticamente os ficheiros lang.
+
+> **Pré-requisito:** `jq` (no macOS: `brew install jq`; Ubuntu: `apt install jq`).
+
 ---
 
 ## Vulnerabilidades de segurança
