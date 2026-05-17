@@ -46,6 +46,8 @@
         </main>
     </div>
 
+    @auth<x-help-drawer />@endauth
+
     @stack('scripts')
 </body>
 </html>

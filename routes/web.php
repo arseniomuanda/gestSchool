@@ -46,6 +46,11 @@ Route::get('/privacidade', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
+// Ajuda in-app (issue #43) — pública: páginas de auth também precisam
+Route::get('/help/{key}', [\App\Http\Controllers\HelpController::class, 'show'])
+    ->where('key', '[a-z0-9.\-]+')
+    ->name('help.show');
+
 Route::middleware('auth')->group(function () {
     Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 

@@ -27,7 +27,12 @@
             </div>
         </aside>
 
-        <main class="flex items-center justify-center px-6 py-12">
+        <main class="relative flex items-center justify-center px-6 py-12">
+            {{-- Botão de ajuda flutuante (issue #43) — só aparece se houver .md para a rota actual --}}
+            <div class="absolute top-4 right-4">
+                <x-help-button />
+            </div>
+
             <div class="w-full max-w-md">
                 <div class="lg:hidden mb-8 text-center">
                     <h1 class="text-navy text-2xl font-bold">GestSchool</h1>
@@ -37,5 +42,7 @@
             </div>
         </main>
     </div>
+
+    <x-help-drawer />
 </body>
 </html>
