@@ -1,6 +1,11 @@
-@php($funcionario = $funcionario ?? null)
-@php($u = $funcionario?->user)
-@php($currentRole = old('role', $u?->roles->first()?->name))
+@php
+    $funcionario = $funcionario ?? null;
+    $u = $funcionario?->user;
+    $currentRole = old('role', $u?->roles->first()?->name);
+    $categoria = $categoria ?? $funcionario?->categoria ?? 'administrativo';
+    $routeBase = $routeBase ?? 'funcionarios';
+    $funcoesAuxiliar = $funcoesAuxiliar ?? \App\Models\Funcionario::FUNCOES_AUXILIAR;
+@endphp
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <x-input name="name" :label="__('Name')" :value="$u?->name" required />
     <x-input name="email" :label="__('Email')" type="email" :value="$u?->email" required />
@@ -11,6 +16,15 @@
         @endforeach
     </x-select>
     <x-input name="numero_funcionario" label="{{ __('Staff Number') }}" :value="$funcionario?->numero_funcionario" />
+
+    @if($categoria === 'auxiliar')
+        <x-select name="funcao" :label="__('Auxiliary function')" required :placeholder="null">
+            @foreach($funcoesAuxiliar as $f)
+                <option value="{{ $f }}" @selected(old('funcao', $funcionario?->funcao) === $f)>{{ __('funcao_' . $f) }}</option>
+            @endforeach
+        </x-select>
+    @endif
+
     <x-input name="bi" :label="__('BI Number')" :value="$funcionario?->bi" />
     <x-input name="data_nascimento" :label="__('Birth Date')" type="date" :value="$funcionario?->data_nascimento?->format('Y-m-d')" />
     <x-select name="sexo" :label="__('Gender')">
@@ -27,5 +41,5 @@
 
 <div class="flex items-center gap-3 mt-6">
     <x-btn variant="primary" type="submit">{{ __('Save') }}</x-btn>
-    <x-btn variant="secondary" :href="route('funcionarios.index')">{{ __('Cancel') }}</x-btn>
+    <x-btn variant="secondary" :href="route($routeBase . '.index')">{{ __('Cancel') }}</x-btn>
 </div>

@@ -28,7 +28,7 @@
                 <x-sidebar-link :href="route('professores.index')" icon="user-cog" :active="request()->routeIs('professores.*')" :label="__('Teaching Staff')">{{ __('Teaching Staff') }}</x-sidebar-link>
                 <x-sidebar-link :href="route('faltas-professores.index')" icon="user-x" :active="request()->routeIs('faltas-professores.*')" :label="__('Teacher absences')">{{ __('Teacher absences') }}</x-sidebar-link>
                 <x-sidebar-link :href="route('funcionarios.index')" icon="briefcase" :active="request()->routeIs('funcionarios.*')" :label="__('Administrative Staff')">{{ __('Administrative Staff') }}</x-sidebar-link>
-                <x-sidebar-link href="#" icon="hard-hat" :label="__('Auxiliary Staff')" disabled :badge="__('soon')">
+                <x-sidebar-link :href="route('pessoal-auxiliar.index')" icon="hard-hat" :active="request()->routeIs('pessoal-auxiliar.*')" :label="__('Auxiliary Staff')">
                     {{ __('Auxiliary Staff') }}
                 </x-sidebar-link>
             </x-sidebar-section>

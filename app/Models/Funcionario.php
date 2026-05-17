@@ -16,6 +16,8 @@ class Funcionario extends Model
     protected $fillable = [
         'user_id',
         'numero_funcionario',
+        'categoria',
+        'funcao',
         'bi',
         'data_nascimento',
         'sexo',
@@ -24,6 +26,30 @@ class Funcionario extends Model
         'data_admissao',
         'morada',
     ];
+
+    /** Lista dos valores possíveis (mantém sincronizado com a migration). */
+    public const CATEGORIAS = ['administrativo', 'auxiliar'];
+    public const FUNCOES_AUXILIAR = ['limpeza', 'seguranca', 'motorista', 'jardinagem', 'cantina', 'outro'];
+
+    public function scopeAdministrativos($query)
+    {
+        return $query->where('categoria', 'administrativo');
+    }
+
+    public function scopeAuxiliares($query)
+    {
+        return $query->where('categoria', 'auxiliar');
+    }
+
+    public function getIsAuxiliarAttribute(): bool
+    {
+        return $this->categoria === 'auxiliar';
+    }
+
+    public function getIsAdministrativoAttribute(): bool
+    {
+        return $this->categoria === 'administrativo';
+    }
 
     protected function casts(): array
     {

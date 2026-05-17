@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:director_geral|director_pedagogico|secretario')->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('funcionarios', FuncionarioController::class)->parameters(['funcionarios' => 'funcionario']);
+        // Pessoal Auxiliar (issue #35) — partilha o FuncionarioController
+        Route::resource('pessoal-auxiliar', FuncionarioController::class)->parameters(['pessoal-auxiliar' => 'funcionario']);
         Route::resource('professores', ProfessorController::class)->parameters(['professores' => 'professor']);
         Route::resource('alunos', AlunoController::class)->parameters(['alunos' => 'aluno']);
         Route::get('encarregados/search', [EncarregadoController::class, 'search'])->name('encarregados.search');
