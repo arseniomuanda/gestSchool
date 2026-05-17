@@ -21,6 +21,15 @@
 - 🔓 Grátis para escolas públicas, IPSS, ONG e missões — uso comercial proibido
 - 🚧 Em desenvolvimento activo — pronto para demo/staging
 
+## Demo online
+
+Experimenta sem instalar nada: **[abactinal-hypostatically-anna.ngrok-free.dev](https://abactinal-hypostatically-anna.ngrok-free.dev)**
+
+Usa qualquer um dos [perfis de acesso](#perfis-de-acesso) (password `password`) para testar.
+
+> ⚠️ Túnel temporário via ngrok — pode estar offline fora de horas de demonstração e os dados podem
+> ser repostos sem aviso. Para uso real, [instala localmente](#instalação-rápida).
+
 ---
 
 ## Sobre
