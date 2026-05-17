@@ -10,11 +10,20 @@
 
 <x-card :title="$title">
     @if($searchPlaceholder || $createUrl || $filters)
-        <form method="GET" class="filter-bar mb-6">
+        <form method="GET" class="filter-bar mb-6" autocomplete="off" role="search">
             @if($searchPlaceholder)
                 <div class="grow min-w-[200px]">
                     <label class="form-label">{{ __('Search') }}</label>
-                    <input type="text" name="{{ $searchName }}" value="{{ $searchValue }}" class="form-input" placeholder="{{ $searchPlaceholder }}">
+                    <input type="search"
+                           name="{{ $searchName }}"
+                           value="{{ $searchValue }}"
+                           class="form-input"
+                           placeholder="{{ $searchPlaceholder }}"
+                           autocomplete="off"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           spellcheck="false"
+                           data-form-type="search">
                 </div>
             @endif
             {{ $filters }}

@@ -8,10 +8,10 @@
     </x-page-header>
 
     <x-card>
-        <form method="GET" class="flex flex-wrap items-end gap-3 mb-4">
+        <form method="GET" class="flex flex-wrap items-end gap-3 mb-4" autocomplete="off" role="search">
             <div>
                 <label class="form-label">{{ __('Month') }}</label>
-                <input type="month" name="mes" value="{{ $mes }}" class="form-input">
+                <input type="month" name="mes" value="{{ $mes }}" class="form-input" autocomplete="off">
             </div>
             @if($professores->isNotEmpty())
                 <div>

@@ -11,7 +11,7 @@
 
     {{-- Toggle de fórmula --}}
     <x-card :title="__('Calculation formula')" class="no-print">
-        <form method="GET" class="flex flex-wrap items-end gap-3">
+        <form method="GET" class="flex flex-wrap items-end gap-3" autocomplete="off">
             <div>
                 <label class="form-label">{{ __('Weight') }} 1º</label>
                 <input type="number" min="1" max="5" name="peso_t1" value="{{ $calc->pesos[0] }}" class="form-input w-20">
