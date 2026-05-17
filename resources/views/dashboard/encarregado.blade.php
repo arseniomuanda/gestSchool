@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-page-header :title="__('Dashboard')" :subtitle="__('Welcome') . ', ' . Auth::user()->name">
+    <x-page-header :title="__('Dashboard')" :subtitle="__('Welcome') . ', ' . Auth::user()->name" help="dashboard.encarregado">
         <x-slot name="actions">
             <x-btn variant="primary" icon="users" :href="route('meus-educandos.index')">{{ __('My Children') }}</x-btn>
         </x-slot>

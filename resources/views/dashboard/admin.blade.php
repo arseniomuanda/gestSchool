@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-page-header :title="__('Dashboard')" :subtitle="__('School Management')" />
+    <x-page-header :title="__('Dashboard')" :subtitle="__('School Management')" help="dashboard.admin" />
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-6">
         <x-stat-card :label="__('Users')" :value="$stats['users']" icon="users" variant="primary" :href="route('users.index')" />

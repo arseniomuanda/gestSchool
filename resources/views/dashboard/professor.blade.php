@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-page-header :title="__('Dashboard')" :subtitle="__('Welcome') . ', ' . Auth::user()->name" />
+    <x-page-header :title="__('Dashboard')" :subtitle="__('Welcome') . ', ' . Auth::user()->name" help="dashboard.professor" />
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <x-card :title="__('Profile')">
