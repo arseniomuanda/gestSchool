@@ -16,6 +16,7 @@
         <x-slot name="actions">
             @if($matriculaActiva)
                 <x-btn variant="primary" icon="file-text" :href="route('boletim.show', $matriculaActiva)">{{ __('Report Card') }}</x-btn>
+                <x-btn variant="info" icon="clock" :href="route('horarios.turma', $matriculaActiva->turma)">{{ __('Schedule') }}</x-btn>
                 <x-btn variant="dark" icon="printer" :href="route('boletim.pdf', $matriculaActiva)">PDF</x-btn>
             @endif
             <x-btn variant="secondary" icon="arrow-left" :href="route('meus-educandos.index')">{{ __('Back') }}</x-btn>
@@ -64,7 +65,8 @@
                 @if($aluno->matriculas->isEmpty())
                     <x-empty icon="inbox" :title="__('No enrollments yet')" :description="__('No enrollment records found for this student.')" />
                 @else
-                    <div class="table-wrapper">
+                    {{-- Desktop: tabela --}}
+                    <div class="hidden md:block table-wrapper">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -130,6 +132,64 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Mobile: stack de cards --}}
+                    <ul class="md:hidden space-y-3 -mx-2">
+                        @foreach($aluno->matriculas as $m)
+                            @php
+                                $r = $resumos[$m->id] ?? ['media_anual' => null, 'presencas_pct' => null, 'faltas' => 0];
+                                $estVar = match ($m->estado) {
+                                    'activa' => 'success',
+                                    'aprovado' => 'success',
+                                    'reprovado' => 'danger',
+                                    'transferido' => 'info',
+                                    'desistente' => 'muted',
+                                    default => 'muted',
+                                };
+                            @endphp
+                            <li class="border border-gray-200 rounded-input p-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <div class="text-base font-bold text-navy">{{ $m->anoLectivo->codigo }}</div>
+                                        <div class="text-sm text-navy mt-0.5">{{ $m->turma->classe->nome }} {{ $m->turma->nome }}</div>
+                                        <div class="text-xs text-muted">{{ $m->turma->curso?->nome ?? __('Common Core') }}</div>
+                                    </div>
+                                    <x-badge :variant="$estVar">{{ __($m->estado) }}</x-badge>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 mt-3 text-center">
+                                    <div class="rounded bg-gray-50 py-2">
+                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
+                                        <div @class([
+                                            'text-base font-bold tabular-nums mt-0.5',
+                                            'text-danger' => ($r['media_anual'] ?? null) !== null && $r['media_anual'] < 10,
+                                            'text-success' => ($r['media_anual'] ?? 0) >= 14,
+                                            'text-navy' => ($r['media_anual'] ?? 0) >= 10 && ($r['media_anual'] ?? 0) < 14,
+                                            'text-muted' => $r['media_anual'] === null,
+                                        ])>
+                                            {{ $r['media_anual'] !== null ? number_format($r['media_anual'], 1) : '—' }}
+                                        </div>
+                                    </div>
+                                    <div class="rounded bg-gray-50 py-2">
+                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
+                                        <div @class([
+                                            'text-base font-bold tabular-nums mt-0.5',
+                                            'text-warning' => ($r['presencas_pct'] ?? null) !== null && $r['presencas_pct'] < 85,
+                                            'text-navy' => ($r['presencas_pct'] ?? 0) >= 85,
+                                            'text-muted' => $r['presencas_pct'] === null,
+                                        ])>
+                                            {{ $r['presencas_pct'] !== null ? $r['presencas_pct'].'%' : '—' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 mt-3">
+                                    <x-btn variant="secondary" size="sm" :href="route('boletim.show', $m)" icon="eye">{{ __('View') }}</x-btn>
+                                    <x-btn variant="primary" size="sm" :href="route('boletim.pdf', $m)" icon="file-down">PDF</x-btn>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
                 @endif
             </x-card>
 

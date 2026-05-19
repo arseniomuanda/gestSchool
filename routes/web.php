@@ -78,6 +78,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('trimestres', TrimestreController::class)->parameters(['trimestres' => 'trimestre']);
     });
 
+    // Consulta de horário da turma — encarregado também (filtrado por policy)
+    Route::middleware('role:director_geral|director_pedagogico|secretario|professor|professor_assistente|encarregado')->group(function () {
+        Route::get('/horarios/turma/{turma}', [HorarioController::class, 'turma'])->name('horarios.turma');
+        Route::get('/horarios/turma/{turma}/pdf', [HorarioController::class, 'turmaPdf'])->name('horarios.turma.pdf');
+    });
+
     // Acesso para direcção + professores
     Route::middleware('role:director_geral|director_pedagogico|secretario|professor|professor_assistente')->group(function () {
         // Faltas dos professores ao serviço (issue #34) — Policy controla CRUD vs view-self
@@ -115,8 +121,6 @@ Route::middleware('auth')->group(function () {
 
         // Horários — consulta para todos os roles de operação, CRUD restrito a direcção
         Route::get('/horarios', [HorarioController::class, 'index'])->name('horarios.index');
-        Route::get('/horarios/turma/{turma}', [HorarioController::class, 'turma'])->name('horarios.turma');
-        Route::get('/horarios/turma/{turma}/pdf', [HorarioController::class, 'turmaPdf'])->name('horarios.turma.pdf');
         Route::get('/horarios/professor/{professor}', [HorarioController::class, 'professor'])->name('horarios.professor');
         Route::get('/horarios/professor/{professor}/pdf', [HorarioController::class, 'professorPdf'])->name('horarios.professor.pdf');
     });

@@ -22,10 +22,22 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans">
-    <div class="app-shell">
+    <div class="app-shell"
+         x-data="{ sidebarOpen: false }"
+         x-on:open-sidebar.window="sidebarOpen = true"
+         x-on:close-sidebar.window="sidebarOpen = false"
+         x-on:keydown.escape.window="sidebarOpen = false"
+         x-on:resize.window.debounce.150ms="if (window.innerWidth >= 1024) sidebarOpen = false">
+
         <x-navbar />
         <x-sidebar />
         @auth<x-smart-search />@endauth
+
+        {{-- Scrim para drawer mobile --}}
+        <div x-show="sidebarOpen" x-cloak x-transition.opacity
+             class="sidebar-scrim"
+             x-on:click="sidebarOpen = false"
+             aria-hidden="true"></div>
 
         <main class="app-main">
             <div class="app-content">
@@ -36,7 +48,8 @@
                 {{ $slot }}
             </div>
 
-            <footer class="px-6 py-4 mt-8 border-t border-gray-100 text-xs text-muted flex flex-wrap items-center justify-between gap-2">
+            <footer class="px-4 sm:px-6 py-4 mt-8 border-t border-gray-100 text-xs text-muted flex flex-wrap items-center justify-between gap-2"
+                    style="padding-bottom: calc(env(safe-area-inset-bottom, 0) + 1rem);">
                 <span>© {{ date('Y') }} {{ config('app.name') }}</span>
                 <a href="{{ route('legal.privacidade') }}" class="hover:text-primary inline-flex items-center gap-1">
                     <x-lucide-shield class="w-3 h-3" />

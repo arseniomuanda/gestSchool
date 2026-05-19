@@ -11,7 +11,7 @@ use App\Models\User;
  * Regras:
  * - Direcção/Secretaria → vê e gere qualquer turma
  * - Professor/Assistente → vê só turmas onde lecciona OU é director de turma
- * - Encarregado/Aluno → fora deste fluxo (vão pelo portal próprio)
+ * - Encarregado → vê turmas onde tem aluno matriculado (apenas leitura)
  */
 class TurmaPolicy
 {
@@ -35,6 +35,14 @@ class TurmaPolicy
 
             // Caso 2: tem atribuição nesta turma (lecciona pelo menos uma disciplina)
             return $turma->atribuicoes()->where('professor_id', $prof->id)->exists();
+        }
+
+        // Encarregado: vê horário da turma onde tem aluno matriculado (qualquer estado).
+        if ($user->hasRole('encarregado') && $user->encarregado) {
+            return \App\Models\Matricula::query()
+                ->where('turma_id', $turma->id)
+                ->whereIn('aluno_id', $user->encarregado->alunos()->pluck('alunos.id'))
+                ->exists();
         }
 
         return false;

@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Comunicado;
 use App\Models\Encarregado;
+use App\Models\Evento;
 use App\Models\Funcionario;
 use App\Models\Professor;
 use App\Models\User;
+use App\Services\BoletimService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, BoletimService $boletimService)
     {
         $user = $request->user();
 
@@ -20,6 +23,7 @@ class DashboardController extends Controller
                 ->with([
                     'alunos.user',
                     'alunos.matriculas.turma.classe',
+                    'alunos.matriculas.turma.curso',
                     'alunos.matriculas.anoLectivo',
                 ])
                 ->first();
@@ -27,7 +31,9 @@ class DashboardController extends Controller
             $alunos = $encarregado?->alunos ?? collect();
 
             // Alertas por aluno: notas baixas (<10) e faltas recentes (≥3 últimos 30 dias)
+            // E resumo (média, presenças, faltas) da matrícula activa.
             $alertas = [];
+            $resumosActivos = [];
             $diasAlerta = now()->subDays(30);
 
             foreach ($alunos as $aluno) {
@@ -35,6 +41,11 @@ class DashboardController extends Controller
                 if (! $matriculaActiva) {
                     continue;
                 }
+
+                $resumosActivos[$aluno->id] = [
+                    'matricula' => $matriculaActiva,
+                    'summary' => $boletimService->quickSummary($matriculaActiva),
+                ];
 
                 $notasBaixas = \App\Models\Nota::where('matricula_id', $matriculaActiva->id)
                     ->where('valor', '<', 10)
@@ -59,7 +70,27 @@ class DashboardController extends Controller
                 }
             }
 
-            return view('dashboard.encarregado', compact('encarregado', 'alunos', 'alertas'));
+            $proximosEventos = Evento::query()
+                ->visivelPara($user)
+                ->where(fn ($q) => $q->where('data_inicio', '>=', now()->toDateString())
+                                     ->orWhere('data_fim', '>=', now()->toDateString()))
+                ->with(['turma.classe', 'classe'])
+                ->orderBy('data_inicio')
+                ->limit(5)
+                ->get();
+
+            $ultimosComunicados = Comunicado::query()
+                ->publicados()
+                ->visivelPara($user)
+                ->with('autor')
+                ->orderByDesc('publicado_em')
+                ->limit(3)
+                ->get();
+
+            return view('dashboard.encarregado', compact(
+                'encarregado', 'alunos', 'alertas', 'resumosActivos',
+                'proximosEventos', 'ultimosComunicados'
+            ));
         }
 
         if ($user->hasAnyRole(['professor', 'professor_assistente'])) {

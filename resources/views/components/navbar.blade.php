@@ -6,7 +6,10 @@
     </a>
 
     <div class="navbar-inner">
-        <button type="button" class="lg:hidden navbar-icon-btn" onclick="document.querySelector('.sidebar').classList.toggle('hidden')">
+        <button type="button"
+                class="lg:hidden navbar-icon-btn"
+                x-on:click="sidebarOpen = true"
+                aria-label="{{ __('Open menu') }}">
             <x-lucide-menu class="w-5 h-5" />
         </button>
 

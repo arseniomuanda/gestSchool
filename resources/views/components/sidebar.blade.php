@@ -6,7 +6,10 @@
     $isEnc = $user?->hasRole('encarregado');
 @endphp
 
-<aside class="sidebar scroll-thin" data-sidebar>
+<aside class="sidebar scroll-thin"
+       data-sidebar
+       :class="sidebarOpen ? 'is-mobile-open' : ''"
+       x-on:click="if ($event.target.closest('a, button') && window.innerWidth < 1024) sidebarOpen = false">
     <nav class="py-4">
         <div class="sb-group" data-sb-group="main">
             <div class="sb-group-items">

@@ -66,7 +66,7 @@
         </table>
 
         {{-- Legenda --}}
-        <div class="flex flex-wrap gap-3 mt-6 text-xs">
+        <div class="hidden sm:flex flex-wrap gap-3 mt-6 text-xs">
             @foreach(config('escola.tipos_evento') as $key => $info)
                 <span class="inline-flex items-center gap-1">
                     <span class="w-3 h-3 rounded" style="background-color: {{ $info['cor'] }};"></span>
