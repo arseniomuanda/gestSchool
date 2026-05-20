@@ -167,7 +167,17 @@ A geração demora cerca de 40 segundos em hardware moderno.
 
 ### Perfis de acesso
 
-Todos os utilizadores demo usam a password **`password`**.
+**Contas demo para teste / demo rápida** — copia e cola:
+
+```
+director@gestschool.test       (acesso total)
+professor@gestschool.test      (aulas, presenças, notas)
+encarregado@gestschool.test    (boletim e comunicados dos educandos)
+
+senha: password
+```
+
+Lista completa dos 7 perfis pré-configurados:
 
 | Email | Perfil | O que pode fazer |
 |---|---|---|
@@ -178,6 +188,8 @@ Todos os utilizadores demo usam a password **`password`**.
 | `assistente@gestschool.test` | Professor Assistente | Aulas, presenças (sem notas) |
 | `encarregado@gestschool.test` | Encarregado | Boletim, presenças e comunicados dos seus educandos |
 | `aluno@gestschool.test` | Aluno | Acesso de leitura ao próprio percurso |
+
+Todos usam a mesma password: **`password`**.
 
 ## Estrutura do projecto
 
