@@ -45,14 +45,16 @@ export default {
                 },
                 accent: '#e85d4e',
                 navy: '#001737',
-                body: '#a7afb7',
-                muted: '#76838f',
+                // Texto: contraste mínimo WCAG AA (4.5:1) — preferindo AAA (7:1) para body
+                body: '#475569',   // 7.55:1 em #fff (AAA)
+                muted: '#64748b',  // 4.85:1 em #fff (AA com folga)
+                // Sidebar na família teal (mesmo tom mais escuro que primary)
                 sidebar: {
-                    DEFAULT: '#181824',
-                    hover: '#161621',
-                    text: '#bfbfd0',
+                    DEFAULT: '#0a3a2c',
+                    hover: '#082820',
+                    text: '#c8d4ce',
                 },
-                'secondary-text': '#8e94a9',
+                'secondary-text': '#64748b',  // alinhado com `muted`
             },
             borderRadius: {
                 btn: '3px',

@@ -94,7 +94,7 @@
         @apply flex items-center gap-3 px-6 py-3 text-sm font-medium text-sidebar-text/80 border-l-4 border-transparent hover:bg-sidebar-hover hover:text-white transition;
     }
     .sidebar-link.is-active {
-        @apply text-success border-success bg-sidebar-hover;
+        @apply text-accent border-accent bg-sidebar-hover;
     }
     .sidebar-link .sidebar-icon {
         @apply w-5 h-5 shrink-0;
