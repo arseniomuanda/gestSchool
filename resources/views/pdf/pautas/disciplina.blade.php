@@ -17,7 +17,7 @@
                 @foreach($avaliacoes as $av)
                     <th>{{ $av->titulo }}<br><span style="font-size:7px;color:#76838f">peso {{ rtrim(rtrim($av->peso, '0'), '.') }}</span></th>
                 @endforeach
-                <th style="background:#e0edff">{{ __('Term Average') }}</th>
+                <th style="background:#dfe8e3">{{ __('Term Average') }}</th>
             </tr>
         </thead>
         <tbody>

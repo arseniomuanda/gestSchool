@@ -19,7 +19,7 @@
                 @foreach($atribuicoes as $atr)
                     <th colspan="{{ count($trimestres) + 1 }}">{{ $atr->disciplina->sigla ?: \Illuminate\Support\Str::limit($atr->disciplina->nome, 5) }}</th>
                 @endforeach
-                <th rowspan="2" style="vertical-align: bottom; background:#e0edff">{{ __('Average') }}</th>
+                <th rowspan="2" style="vertical-align: bottom; background:#dfe8e3">{{ __('Average') }}</th>
                 <th rowspan="2" style="vertical-align: bottom">{{ __('Situation') }}</th>
             </tr>
             <tr>
@@ -43,7 +43,7 @@
                         @php($anual = $mediasAnuais[$m->id][$atr->disciplina_id] ?? null)
                         <td style="background:#f8fafc" class="{{ ($anual !== null && $anual < $calc->notaMinima) ? 'neg' : '' }}"><strong>{{ $anual !== null ? $anual : '—' }}</strong></td>
                     @endforeach
-                    <td style="background:#e0edff" class="{{ ($mediaGeral[$m->id] ?? null) !== null && $mediaGeral[$m->id] < $calc->notaMinima ? 'neg' : '' }}"><strong>{{ ($mediaGeral[$m->id] ?? null) !== null ? $mediaGeral[$m->id] : '—' }}</strong></td>
+                    <td style="background:#dfe8e3" class="{{ ($mediaGeral[$m->id] ?? null) !== null && $mediaGeral[$m->id] < $calc->notaMinima ? 'neg' : '' }}"><strong>{{ ($mediaGeral[$m->id] ?? null) !== null ? $mediaGeral[$m->id] : '—' }}</strong></td>
                     @php($sit = $situacao[$m->id])
                     <td class="{{ $sit === 'aprovado' ? 'approved' : ($sit === 'recurso' ? 'second' : ($sit === 'reprovado' ? 'failed' : 'pending')) }}">{{ __(ucfirst($sit)) }}</td>
                 </tr>

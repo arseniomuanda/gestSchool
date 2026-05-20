@@ -19,7 +19,7 @@
         <x-checkbox name="dia_inteiro" :label="__('All day')" :checked="old('dia_inteiro', $evento?->dia_inteiro ?? true)" />
     </div>
     <div>
-        <x-input name="cor" :label="__('Color (optional)')" :value="$evento?->cor" placeholder="#0062ff" help="{{ __('Override default color of the event type.') }}" />
+        <x-input name="cor" :label="__('Color (optional)')" :value="$evento?->cor" placeholder="#0f4d3a" help="{{ __('Override default color of the event type.') }}" />
     </div>
     <x-select name="classe_id" :label="__('Class (optional)')" help="{{ __('Limit visibility to a class level.') }}">
         @foreach($classes as $c)<option value="{{ $c->id }}" @selected(old('classe_id', $evento?->classe_id) == $c->id)>{{ $c->nome }}</option>@endforeach

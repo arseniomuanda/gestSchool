@@ -15,10 +15,14 @@ export default {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
             },
             colors: {
+                // 3 cores brand alinhadas com a welcome page (paleta "brochura escolar"):
+                //   · primary  #0f4d3a (teal)   — CTAs, links, brand
+                //   · accent   #e85d4e (coral)  — atrasos, realces
+                //   · navy     #001737          — texto, surfaces escuras
                 primary: {
-                    DEFAULT: '#0062ff',
-                    soft: '#e0edff',
-                    600: '#0050d4',
+                    DEFAULT: '#0f4d3a',
+                    soft: '#dfe8e3',
+                    600: '#0a3a2c',
                 },
                 success: {
                     DEFAULT: '#44ce42',
@@ -32,11 +36,14 @@ export default {
                     DEFAULT: '#ffc542',
                     soft: '#fff5d5',
                 },
+                // info passa a ser alias visual de primary (era roxo #a461d8) —
+                // badges/alerts "info" continuam a existir como conceito, mas
+                // renderizam em primary-soft, sem introduzir 4ª cor.
                 info: {
-                    DEFAULT: '#a461d8',
-                    soft: '#f1e4fa',
+                    DEFAULT: '#0f4d3a',
+                    soft: '#dfe8e3',
                 },
-                accent: '#f2a654',
+                accent: '#e85d4e',
                 navy: '#001737',
                 body: '#a7afb7',
                 muted: '#76838f',

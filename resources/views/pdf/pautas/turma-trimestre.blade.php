@@ -17,7 +17,7 @@
                 @foreach($atribuicoes as $atr)
                     <th>{{ $atr->disciplina->sigla ?: \Illuminate\Support\Str::limit($atr->disciplina->nome, 6) }}</th>
                 @endforeach
-                <th style="background:#e0edff">{{ __('Average') }}</th>
+                <th style="background:#dfe8e3">{{ __('Average') }}</th>
             </tr>
         </thead>
         <tbody>

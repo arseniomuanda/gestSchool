@@ -15,7 +15,7 @@
             <tr>
                 <th style="width: 40%; text-align: left">{{ __('Subjects List') }}</th>
                 @foreach($trimestres as $t)<th>{{ $t->numero }}º {{ __('Term') }}</th>@endforeach
-                <th style="background:#e0edff">{{ __('Annual Average') }}</th>
+                <th style="background:#dfe8e3">{{ __('Annual Average') }}</th>
             </tr>
         </thead>
         <tbody>

@@ -29,7 +29,7 @@
                             <td class="align-top text-center">
                                 @if($slot)
                                     @foreach($slot as $h)
-                                        <div class="rounded p-2 mb-1 text-xs" style="background-color: {{ $modo === 'turma' ? '#e0edff' : '#e3f8e3' }};">
+                                        <div class="rounded p-2 mb-1 text-xs" style="background-color: {{ $modo === 'turma' ? '#dfe8e3' : '#e3f8e3' }};">
                                             @if($modo === 'turma')
                                                 <div class="font-semibold text-navy">{{ $h->atribuicao->disciplina->nome }}</div>
                                                 <div class="text-[10px] text-muted">{{ $h->atribuicao->professor->user->name }}</div>
