@@ -85,10 +85,10 @@
     </x-card>
 
     {{-- ========== Grid principal: educandos | eventos+comunicados ========== --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
 
         {{-- Coluna principal: Meus Educandos --}}
-        <x-card :title="__('My Children')" class="lg:col-span-2">
+        <x-card :title="__('My Children')" class="xl:col-span-2">
             <x-slot name="actions">
                 <a href="{{ route('meus-educandos.index') }}" class="btn-link text-sm">
                     {{ __('See all') }} <x-lucide-arrow-right class="w-3 h-3 inline" />

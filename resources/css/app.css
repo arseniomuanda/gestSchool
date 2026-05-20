@@ -44,6 +44,7 @@
     }
     .app-content {
         @apply px-4 sm:px-6 lg:px-8 py-8;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0) + 1rem);
     }
 
     /* ---------- NAVBAR ---------- */
@@ -72,10 +73,19 @@
 
     /* ---------- SIDEBAR ---------- */
     .sidebar {
-        @apply fixed top-navbar bottom-0 start-0 w-sidebar bg-sidebar text-sidebar-text overflow-y-auto overflow-x-hidden z-20;
-        @apply hidden lg:block;
-        transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1);
+        @apply fixed top-navbar bottom-0 start-0 w-sidebar bg-sidebar text-sidebar-text overflow-y-auto overflow-x-hidden z-40;
+        transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1), width 220ms cubic-bezier(0.4, 0, 0.2, 1);
         scrollbar-gutter: stable;
+        transform: translateX(-100%);
+    }
+    [dir="rtl"] .sidebar { transform: translateX(100%); }
+    .sidebar.is-mobile-open { transform: translateX(0); }
+    @screen lg {
+        .sidebar { transform: none !important; @apply z-20; }
+    }
+    .sidebar-scrim {
+        @apply fixed inset-0 bg-black/40 z-30 lg:hidden;
+        backdrop-filter: blur(2px);
     }
     .sidebar-section {
         @apply px-6 pt-6 pb-2 text-[10px] uppercase tracking-widest text-sidebar-text/40 font-semibold;
@@ -299,6 +309,15 @@
     .stat-icon-info    { @apply bg-info-soft text-info; }
     .stat-icon-warning { @apply bg-warning-soft text-yellow-700; }
     .stat-icon-danger  { @apply bg-danger-soft text-danger; }
+
+    /* ---------- QUICK ACTIONS (dashboard tiles) ---------- */
+    .qa-tile {
+        @apply flex flex-col items-center justify-center gap-1.5 p-3 sm:p-4 rounded-input border border-gray-200 hover:border-primary hover:bg-primary-soft/30 text-navy text-xs sm:text-sm font-semibold text-center transition;
+        min-height: 76px;
+    }
+    .qa-icon {
+        @apply w-5 h-5 sm:w-6 sm:h-6 text-primary;
+    }
 
     /* ---------- PAGE HEADER ---------- */
     .page-header {
