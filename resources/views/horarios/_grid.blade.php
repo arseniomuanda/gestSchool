@@ -21,7 +21,7 @@
                         <td class="text-center font-mono text-xs text-muted">
                             <div class="font-bold text-navy">{{ $tempoNum }}º</div>
                             <div>{{ \Carbon\Carbon::parse($ini)->format('H:i') }}</div>
-                            <div class="text-[10px]">{{ \Carbon\Carbon::parse($fim)->format('H:i') }}</div>
+                            <div class="text-[0.625rem]">{{ \Carbon\Carbon::parse($fim)->format('H:i') }}</div>
                         </td>
                         @foreach($dias as $diaNum => $diaNome)
                             @php($key = $diaNum . '-' . $tempoNum)
@@ -32,16 +32,16 @@
                                         <div class="rounded p-2 mb-1 text-xs" style="background-color: {{ $modo === 'turma' ? '#dfe8e3' : '#e3f8e3' }};">
                                             @if($modo === 'turma')
                                                 <div class="font-semibold text-navy">{{ $h->atribuicao->disciplina->nome }}</div>
-                                                <div class="text-[10px] text-muted">{{ $h->atribuicao->professor->user->name }}</div>
+                                                <div class="text-[0.625rem] text-muted">{{ $h->atribuicao->professor->user->name }}</div>
                                             @else
                                                 <div class="font-semibold text-navy">{{ $h->atribuicao->disciplina->nome }}</div>
-                                                <div class="text-[10px] text-muted"><x-turma-label :turma="$h->atribuicao->turma" :inline="true" /></div>
+                                                <div class="text-[0.625rem] text-muted"><x-turma-label :turma="$h->atribuicao->turma" :inline="true" /></div>
                                             @endif
                                             @if($h->sala)
-                                                <div class="text-[10px] text-muted mt-0.5">📍 {{ $h->sala }}</div>
+                                                <div class="text-[0.625rem] text-muted mt-0.5">📍 {{ $h->sala }}</div>
                                             @endif
                                             @hasanyrole('director_geral|director_pedagogico|secretario')
-                                                <div class="mt-1 text-[10px] no-print">
+                                                <div class="mt-1 text-[0.625rem] no-print">
                                                     <a href="{{ route('horarios.edit', $h) }}" class="text-primary hover:underline">{{ __('Edit') }}</a>
                                                 </div>
                                             @endhasanyrole

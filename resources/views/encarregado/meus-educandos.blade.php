@@ -42,7 +42,7 @@
                     @if($summary)
                         <div class="grid grid-cols-3 divide-x divide-gray-100 text-center">
                             <div class="px-3 py-3">
-                                <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
+                                <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
                                 <div @class([
                                     'text-lg font-bold tabular-nums mt-0.5',
                                     'text-success' => ($summary['media_anual'] ?? 0) >= 14,
@@ -54,7 +54,7 @@
                                 </div>
                             </div>
                             <div class="px-3 py-3">
-                                <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
+                                <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
                                 <div @class([
                                     'text-lg font-bold tabular-nums mt-0.5',
                                     'text-success' => ($summary['presencas_pct'] ?? 0) >= 90,
@@ -66,7 +66,7 @@
                                 </div>
                             </div>
                             <div class="px-3 py-3">
-                                <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Years') }}</div>
+                                <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Years') }}</div>
                                 <div class="text-lg font-bold tabular-nums mt-0.5 text-navy">{{ $totalAnos }}</div>
                             </div>
                         </div>

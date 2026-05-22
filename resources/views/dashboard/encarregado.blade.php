@@ -113,7 +113,7 @@
                                 </span>
                                 <div class="flex-1 min-w-0">
                                     <div class="font-bold text-navy truncate">{{ $aluno->user->name }}</div>
-                                    <div class="text-[11px] text-muted font-mono mt-0.5">{{ $aluno->numero_processo }}</div>
+                                    <div class="text-[0.6875rem] text-muted font-mono mt-0.5">{{ $aluno->numero_processo }}</div>
                                     @if($matricula)
                                         <div class="mt-1.5 flex items-center gap-1.5 flex-wrap text-xs">
                                             <x-badge variant="primary">{{ $matricula->turma->classe->nome }} {{ $matricula->turma->nome }}</x-badge>
@@ -128,7 +128,7 @@
                             @if($summary)
                                 <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100 text-center">
                                     <div class="px-2 py-2.5">
-                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
+                                        <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
                                         <div @class([
                                             'text-base sm:text-lg font-bold tabular-nums mt-0.5',
                                             'text-success' => ($summary['media_anual'] ?? 0) >= 14,
@@ -140,7 +140,7 @@
                                         </div>
                                     </div>
                                     <div class="px-2 py-2.5">
-                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
+                                        <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
                                         <div @class([
                                             'text-base sm:text-lg font-bold tabular-nums mt-0.5',
                                             'text-success' => ($summary['presencas_pct'] ?? 0) >= 90,
@@ -152,7 +152,7 @@
                                         </div>
                                     </div>
                                     <div class="px-2 py-2.5">
-                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Absences') }}</div>
+                                        <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Absences') }}</div>
                                         <div class="text-base sm:text-lg font-bold tabular-nums mt-0.5 text-navy">
                                             {{ $summary['faltas'] ?? 0 }}
                                         </div>

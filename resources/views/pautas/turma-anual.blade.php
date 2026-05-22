@@ -54,9 +54,9 @@
                         <tr>
                             @foreach($atribuicoes as $atr)
                                 @foreach($trimestres as $t)
-                                    <th class="text-center text-[10px]">{{ $t->numero }}º</th>
+                                    <th class="text-center text-[0.625rem]">{{ $t->numero }}º</th>
                                 @endforeach
-                                <th class="text-center text-[10px] !text-navy">An.</th>
+                                <th class="text-center text-[0.625rem] !text-navy">An.</th>
                             @endforeach
                         </tr>
                     </thead>

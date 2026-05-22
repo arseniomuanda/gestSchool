@@ -11,8 +11,11 @@
 @layer base {
     [x-cloak] { display: none !important; }
 
+    :root { --font-scale: 1; }
+
     html {
         font-family: 'Nunito', system-ui, sans-serif;
+        font-size: calc(16px * var(--font-scale));
     }
     body {
         @apply bg-white text-body antialiased;
@@ -88,7 +91,7 @@
         backdrop-filter: blur(2px);
     }
     .sidebar-section {
-        @apply px-6 pt-6 pb-2 text-[10px] uppercase tracking-widest text-sidebar-text/40 font-semibold;
+        @apply px-6 pt-6 pb-2 text-[0.625rem] uppercase tracking-widest text-sidebar-text/40 font-semibold;
     }
     .sidebar-link {
         @apply flex items-center gap-3 px-6 py-3 text-sm font-medium text-sidebar-text/80 border-l-4 border-transparent hover:bg-sidebar-hover hover:text-white transition;
@@ -106,7 +109,7 @@
         @apply opacity-50 cursor-not-allowed pointer-events-none;
     }
     .sidebar-badge {
-        @apply text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-sidebar-text/20 text-sidebar-text/80 ms-auto shrink-0;
+        @apply text-[0.625rem] uppercase tracking-wide px-1.5 py-0.5 rounded bg-sidebar-text/20 text-sidebar-text/80 ms-auto shrink-0;
     }
 
     /* Collapsible section header (clickable) */
@@ -115,7 +118,7 @@
     }
     .sidebar-section-toggle {
         @apply flex items-center justify-between gap-2 w-full px-6 pt-6 pb-2 text-left;
-        @apply text-[10px] uppercase tracking-widest text-sidebar-text/40 font-semibold;
+        @apply text-[0.625rem] uppercase tracking-widest text-sidebar-text/40 font-semibold;
         @apply hover:text-sidebar-text/70 transition-colors cursor-pointer;
     }
     .sidebar-section-toggle:focus { @apply outline-none; }
@@ -221,7 +224,7 @@
 
     /* ---------- BADGES ---------- */
     .badge {
-        @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold;
+        @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.6875rem] font-semibold;
     }
     .badge-primary  { @apply bg-primary-soft text-primary; }
     .badge-success  { @apply bg-success-soft text-success; }
@@ -267,7 +270,7 @@
         @apply min-w-full text-sm;
     }
     .table thead th {
-        @apply text-left text-[11px] uppercase tracking-wider text-muted font-semibold px-6 py-3 border-b border-gray-200;
+        @apply text-left text-[0.6875rem] uppercase tracking-wider text-muted font-semibold px-6 py-3 border-b border-gray-200;
     }
     .table tbody td {
         @apply px-6 py-3 border-b border-gray-100 align-middle;
@@ -293,7 +296,7 @@
         @apply bg-gray-50;
     }
     .stat-label {
-        @apply text-[11px] uppercase tracking-widest text-muted font-semibold;
+        @apply text-[0.6875rem] uppercase tracking-widest text-muted font-semibold;
     }
     .stat-value {
         @apply mt-2 text-3xl font-bold text-navy leading-none;
@@ -373,7 +376,7 @@
 
     /* ---------- KEYBOARD KEY ---------- */
     kbd {
-        @apply inline-block px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px] font-mono;
+        @apply inline-block px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[0.625rem] font-mono;
     }
 
     /* ---------- PRINT (pautas) ---------- */
@@ -1047,7 +1050,7 @@
         @apply opacity-70;
     }
     .enc-picker-avatar {
-        @apply w-9 h-9 rounded-full bg-primary-soft text-primary font-bold text-[11px] inline-flex items-center justify-center shrink-0 tracking-wide;
+        @apply w-9 h-9 rounded-full bg-primary-soft text-primary font-bold text-[0.6875rem] inline-flex items-center justify-center shrink-0 tracking-wide;
     }
     .enc-picker-option.is-selected .enc-picker-avatar {
         @apply bg-success-soft text-success;
@@ -1108,7 +1111,7 @@
         @apply text-navy font-semibold text-sm leading-tight;
     }
     .enc-card-badge {
-        @apply inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/10 rounded-sm ml-2;
+        @apply inline-flex items-center gap-1 px-1.5 py-0.5 text-[0.625rem] uppercase tracking-wider font-bold text-accent bg-accent/10 rounded-sm ml-2;
     }
     .enc-card-meta {
         @apply text-xs text-muted mt-1 mb-3;
@@ -1206,7 +1209,7 @@
     }
     .combobox-search-kbd {
         @apply hidden sm:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5;
-        @apply text-[10px] font-semibold text-muted bg-white border border-gray-200 rounded shrink-0;
+        @apply text-[0.625rem] font-semibold text-muted bg-white border border-gray-200 rounded shrink-0;
     }
 
     .combobox-list {

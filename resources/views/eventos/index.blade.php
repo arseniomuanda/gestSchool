@@ -52,7 +52,7 @@
                                     </span>
                                 </div>
                                 @foreach($evs as $ev)
-                                    <a href="{{ route('eventos.show', $ev) }}" class="block text-[10px] mt-1 px-1.5 py-0.5 rounded truncate"
+                                    <a href="{{ route('eventos.show', $ev) }}" class="block text-[0.625rem] mt-1 px-1.5 py-0.5 rounded truncate"
                                        style="background-color: {{ $ev->cor_efectiva }}20; color: {{ $ev->cor_efectiva }}; border-left: 3px solid {{ $ev->cor_efectiva }};"
                                        title="{{ $ev->titulo }} ({{ $ev->tipo_nome }})">
                                         {{ $ev->titulo }}

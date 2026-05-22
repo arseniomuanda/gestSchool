@@ -16,6 +16,16 @@
                     document.documentElement.classList.add('sidebar-collapsed');
                 }
             } catch (e) {}
+
+            // Aplica a escala de fonte ANTES da render — sem flash
+            try {
+                var dbScale = @json(auth()->user()?->font_scale ? (float) auth()->user()->font_scale : null);
+                var cookieMatch = document.cookie.match(/(?:^|;\s*)gs_font_scale=([\d.]+)/);
+                var scale = dbScale || (cookieMatch ? parseFloat(cookieMatch[1]) : 1);
+                if (scale && scale >= 0.85 && scale <= 1.50) {
+                    document.documentElement.style.setProperty('--font-scale', scale);
+                }
+            } catch (e) {}
         })();
     </script>
 

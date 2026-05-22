@@ -32,6 +32,10 @@ Route::get('/', fn () => view('welcome'));
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
+// Preferências de acessibilidade — guest também pode mudar (cookie sempre)
+Route::post('/preferences/font-scale', [\App\Http\Controllers\Preferences\FontScaleController::class, 'update'])
+    ->name('preferences.font-scale');
+
 // Política de Privacidade — pública (Lei 22/11)
 Route::get('/privacidade', function () {
     return view('legal.privacidade', [

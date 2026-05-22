@@ -129,7 +129,7 @@
                                         <div class="inline-flex items-center gap-1" x-data="{ open: false }" @click.outside="open = false">
                                             <div class="text-center">
                                                 <div class="font-bold text-navy">{{ $tempoNum }}º</div>
-                                                <div class="text-[10px] text-muted font-mono">{{ $ini }}–{{ $fim }}</div>
+                                                <div class="text-[0.625rem] text-muted font-mono">{{ $ini }}–{{ $fim }}</div>
                                             </div>
                                             <button type="button" class="btn-link btn-link-muted text-xs" @click.prevent="open = !open">
                                                 <x-lucide-more-vertical class="w-4 h-4" />
@@ -188,7 +188,7 @@
                                     <tr>
                                         <td class="text-center align-middle">
                                             <div class="font-bold text-navy">{{ $tempoNum }}º</div>
-                                            <div class="text-[10px] text-muted font-mono">{{ $ini }}–{{ $fim }}</div>
+                                            <div class="text-[0.625rem] text-muted font-mono">{{ $ini }}–{{ $fim }}</div>
                                         </td>
                                         @foreach($diasLectivos as $diaNum)
                                             <td class="p-1 align-top">
@@ -197,7 +197,7 @@
                                                     <template x-if="slots[{{ $diaNum }}][{{ $tempoNum }}].atribuicao_id">
                                                         <div :data-atribuicao-id="slots[{{ $diaNum }}][{{ $tempoNum }}].atribuicao_id"
                                                              :style="cellStyle(slots[{{ $diaNum }}][{{ $tempoNum }}].atribuicao_id)"
-                                                             class="dnd-card cursor-move px-2 py-1 rounded text-[11px] leading-tight"
+                                                             class="dnd-card cursor-move px-2 py-1 rounded text-[0.6875rem] leading-tight"
                                                              :title="cellLabel(slots[{{ $diaNum }}][{{ $tempoNum }}].atribuicao_id)">
                                                             <span x-text="cellLabel(slots[{{ $diaNum }}][{{ $tempoNum }}].atribuicao_id)"></span>
                                                         </div>
@@ -213,17 +213,17 @@
 
                     <div class="xl:col-span-1">
                         <h4 class="form-label text-xs uppercase tracking-wide mb-2">{{ __('Assignments') }}</h4>
-                        <p class="text-[11px] text-muted mb-2">{{ __('Drag a card onto a slot. Drag back here to free a slot.') }}</p>
+                        <p class="text-[0.6875rem] text-muted mb-2">{{ __('Drag a card onto a slot. Drag back here to free a slot.') }}</p>
                         <div data-dnd-pool class="dnd-pool space-y-1 p-2 rounded border border-dashed border-gray-200 bg-gray-50/60 min-h-[120px]">
                             @foreach($atribuicoes as $a)
                                 @php($c = $turmaColors[$a->turma_id])
                                 <div data-atribuicao-id="{{ $a->id }}"
-                                     class="dnd-card cursor-move px-2 py-1 rounded text-[11px] leading-tight flex items-center justify-between gap-1"
+                                     class="dnd-card cursor-move px-2 py-1 rounded text-[0.6875rem] leading-tight flex items-center justify-between gap-1"
                                      style="background: {{ $c['bg'] }}; border-left: 3px solid {{ $c['border'] }}; color: {{ $c['fg'] }}"
                                      x-bind:class="cargaCompleta('{{ $a->id }}') ? 'opacity-50' : ''"
                                      title="{{ $a->turma->classe->nome }}{{ $a->turma->nome }} · {{ $a->disciplina->nome }}">
                                     <span class="truncate">[{{ $a->turma->classe->nome }}{{ $a->turma->nome }}] {{ $a->disciplina->sigla ?: \Illuminate\Support\Str::limit($a->disciplina->nome, 8) }}</span>
-                                    <span class="font-mono text-[10px] shrink-0 bg-white/40 px-1 rounded" x-text="cargaLabel('{{ $a->id }}')"></span>
+                                    <span class="font-mono text-[0.625rem] shrink-0 bg-white/40 px-1 rounded" x-text="cargaLabel('{{ $a->id }}')"></span>
                                 </div>
                             @endforeach
                         </div>

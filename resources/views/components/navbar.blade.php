@@ -31,9 +31,11 @@
 
         <div class="navbar-actions">
             <div class="flex items-center text-xs gap-1">
-                <a href="{{ route('locale.switch', 'pt') }}" class="px-2 py-1 rounded {{ app()->getLocale() === 'pt' ? 'bg-navy text-white' : 'text-muted hover:text-navy' }}">PT</a>
-                <a href="{{ route('locale.switch', 'en') }}" class="px-2 py-1 rounded {{ app()->getLocale() === 'en' ? 'bg-navy text-white' : 'text-muted hover:text-navy' }}">EN</a>
+                <a href="{{ route('locale.switch', 'pt') }}" class="px-2 py-1 rounded {{ app()->getLocale() === 'pt' ? 'bg-primary text-white' : 'text-muted hover:text-navy' }}">PT</a>
+                <a href="{{ route('locale.switch', 'en') }}" class="px-2 py-1 rounded {{ app()->getLocale() === 'en' ? 'bg-primary text-white' : 'text-muted hover:text-navy' }}">EN</a>
             </div>
+
+            <x-font-scale-toggle />
 
             <button type="button" class="navbar-icon-btn relative">
                 <x-lucide-bell class="w-5 h-5" />

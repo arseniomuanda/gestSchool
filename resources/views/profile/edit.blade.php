@@ -10,6 +10,11 @@
             <x-card :title="__('Change password')">
                 @include('profile.partials.update-password-form')
             </x-card>
+
+            <x-card :title="__('Accessibility')">
+                <p class="text-sm text-muted mb-4">{{ __('Choose the text size that is most comfortable for you. The choice is saved on this device and your account.') }}</p>
+                @include('partials.font-scale-widget')
+            </x-card>
         </div>
 
         <x-card :title="__('Delete Account')">

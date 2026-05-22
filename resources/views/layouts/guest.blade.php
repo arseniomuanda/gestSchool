@@ -9,6 +9,18 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=nunito:300,400,600,700&display=swap" rel="stylesheet" />
 
+    <script>
+        (function () {
+            try {
+                var m = document.cookie.match(/(?:^|;\s*)gs_font_scale=([\d.]+)/);
+                var scale = m ? parseFloat(m[1]) : 1;
+                if (scale >= 0.85 && scale <= 1.50) {
+                    document.documentElement.style.setProperty('--font-scale', scale);
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans bg-gray-50">
@@ -29,7 +41,8 @@
 
         <main class="relative flex items-center justify-center px-6 py-12">
             {{-- Botão de ajuda flutuante (issue #43) — só aparece se houver .md para a rota actual --}}
-            <div class="absolute top-4 right-4">
+            <div class="absolute top-4 right-4 flex items-center gap-2">
+                <x-font-scale-toggle />
                 <x-help-button />
             </div>
 

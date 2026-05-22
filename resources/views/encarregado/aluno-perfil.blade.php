@@ -159,7 +159,7 @@
 
                                 <div class="grid grid-cols-2 gap-2 mt-3 text-center">
                                     <div class="rounded bg-gray-50 py-2">
-                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
+                                        <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Average') }}</div>
                                         <div @class([
                                             'text-base font-bold tabular-nums mt-0.5',
                                             'text-danger' => ($r['media_anual'] ?? null) !== null && $r['media_anual'] < 10,
@@ -171,7 +171,7 @@
                                         </div>
                                     </div>
                                     <div class="rounded bg-gray-50 py-2">
-                                        <div class="text-[10px] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
+                                        <div class="text-[0.625rem] uppercase tracking-wider text-muted font-semibold">{{ __('Attendance') }}</div>
                                         <div @class([
                                             'text-base font-bold tabular-nums mt-0.5',
                                             'text-warning' => ($r['presencas_pct'] ?? null) !== null && $r['presencas_pct'] < 85,

@@ -11,22 +11,22 @@
         <div class="p-3 rounded border" x-bind:class="furos.length > 0 ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Gaps') }}</div>
             <div class="text-2xl font-bold" x-text="furos.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Empty slots between two filled ones same day') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Empty slots between two filled ones same day') }}</div>
         </div>
         <div class="p-3 rounded border" x-bind:class="naoEscaladas.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Unscheduled') }}</div>
             <div class="text-2xl font-bold" x-text="naoEscaladas.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Assignments with zero periods') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Assignments with zero periods') }}</div>
         </div>
         <div class="p-3 rounded border" x-bind:class="cargaIssues.falta.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Missing periods') }}</div>
             <div class="text-2xl font-bold" x-text="cargaIssues.falta.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Subjects below weekly load') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Subjects below weekly load') }}</div>
         </div>
         <div class="p-3 rounded border" x-bind:class="cargaIssues.excesso.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Excess periods') }}</div>
             <div class="text-2xl font-bold" x-text="cargaIssues.excesso.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Subjects above weekly load') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Subjects above weekly load') }}</div>
         </div>
     </div>
 
@@ -35,17 +35,17 @@
         <div class="p-3 rounded border" x-bind:class="concentracaoDiaria.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Daily concentration') }}</div>
             <div class="text-2xl font-bold" x-text="concentracaoDiaria.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Heavy subjects packed into one day') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Heavy subjects packed into one day') }}</div>
         </div>
         <div class="p-3 rounded border" x-bind:class="tempasConsecutivos.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Consecutive periods') }}</div>
             <div class="text-2xl font-bold" x-text="tempasConsecutivos.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Teachers with too many periods in a row') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Teachers with too many periods in a row') }}</div>
         </div>
         <div class="p-3 rounded border" x-bind:class="horasMas.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'">
             <div class="text-xs uppercase tracking-wide opacity-70">{{ __('Difficult hours') }}</div>
             <div class="text-2xl font-bold" x-text="horasMas.length"></div>
-            <div class="text-[11px] mt-1 opacity-70">{{ __('Heavy subjects in late slots') }}</div>
+            <div class="text-[0.6875rem] mt-1 opacity-70">{{ __('Heavy subjects in late slots') }}</div>
         </div>
     </div>
 

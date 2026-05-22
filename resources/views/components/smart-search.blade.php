@@ -90,7 +90,7 @@
                 {{-- Grouped results --}}
                 <template x-for="(group, gi) in groups" :key="group.type">
                     <div class="py-1">
-                        <div class="px-4 pt-2 pb-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted font-semibold">
+                        <div class="px-4 pt-2 pb-1 flex items-center gap-2 text-[0.625rem] uppercase tracking-widest text-muted font-semibold">
                             <span class="text-muted" x-html="iconFor(group.icon)"></span>
                             <span x-text="group.label" class="flex-1"></span>
                             <span class="text-body font-normal" x-text="group.results.length"></span>

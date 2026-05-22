@@ -24,7 +24,7 @@
                             @foreach($avaliacoes as $av)
                                 <th class="text-center">
                                     <div class="text-xs">{{ $av->titulo }}</div>
-                                    <div class="text-[10px] text-muted normal-case tracking-normal">{{ __('weight') }} {{ rtrim(rtrim($av->peso, '0'), '.') }}</div>
+                                    <div class="text-[0.625rem] text-muted normal-case tracking-normal">{{ __('weight') }} {{ rtrim(rtrim($av->peso, '0'), '.') }}</div>
                                 </th>
                             @endforeach
                             <th class="text-center !text-navy font-bold">{{ __('Term Average') }}</th>

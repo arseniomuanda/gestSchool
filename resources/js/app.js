@@ -3,6 +3,7 @@ import './sidebar';
 import './smart-search';
 import './encarregados-picker';
 import './horario-editor';
+import './font-scale';
 
 import Alpine from 'alpinejs';
 import Sortable from 'sortablejs';
